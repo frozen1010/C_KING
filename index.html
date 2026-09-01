@@ -1,0 +1,3873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- iOS / 移动端主屏体验 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="C_KING">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3b5bdb">
+<title>C_KING v1.2 · C语言题库抽查系统</title>
+<style>
+/* C_KING 样式：现代简洁、移动/桌面自适应、支持日/夜主题 */
+:root {
+  --bg: #f2f5fb;
+  --card: #ffffff;
+  --ink: #26324a;
+  --muted: #7a869e;
+  --primary: #3b5bdb;
+  --primary-dark: #2f4ab8;
+  --primary-soft: #e8edfb;
+  --green: #2f9e44;
+  --green-soft: #e6f6ea;
+  --red: #e03131;
+  --red-soft: #fdeaea;
+  --yellow: #b98900;
+  --yellow-soft: #fdf3d7;
+  --border: #e3e8f2;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(38, 50, 74, 0.08);
+  --mono: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  --code-bg: #1f2430;
+}
+/* 夜间主题 */
+:root[data-theme="dark"] {
+  --bg: #12161f;
+  --card: #1c2332;
+  --ink: #dde5f2;
+  --muted: #8b97ad;
+  --primary: #6c8cff;
+  --primary-dark: #5a7af0;
+  --primary-soft: #273252;
+  --green: #4cc26a;
+  --green-soft: #1a3022;
+  --red: #ff6b6b;
+  --red-soft: #382025;
+  --yellow: #e6b94f;
+  --yellow-soft: #3a2f16;
+  --border: #2c3548;
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.65;
+  -webkit-text-size-adjust: 100%;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+#app { max-width: 760px; margin: 0 auto; padding: 18px 14px 90px; }
+.hidden { display: none !important; }
+
+/* ---------- 通用 ---------- */
+button { font-family: inherit; cursor: pointer; }
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.06s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn.primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(59, 91, 219, 0.35); }
+.btn.primary:hover { background: var(--primary-dark); }
+.btn.ghost { background: var(--card); color: var(--primary); border: 2px solid var(--primary); }
+.btn.ghost:hover { background: var(--primary-soft); }
+.btn.small { padding: 8px 14px; font-size: 14px; border-radius: 10px; }
+.link-btn {
+  background: none; border: none; color: var(--muted);
+  font-size: 15px; padding: 8px 4px; text-decoration: underline;
+}
+.link-btn:hover { color: var(--primary); }
+.hero { text-align: center; padding: 26px 0 8px; }
+.hero h1 { font-size: 42px; margin: 0; letter-spacing: 2px; }
+.hero .sub { color: var(--muted); margin: 6px 0 0; font-size: 15px; }
+.hero .foot { color: var(--muted); margin: 4px 0 0; font-size: 13px; }
+
+/* ---------- 主页菜单 ---------- */
+.menu { display: flex; flex-direction: column; gap: 14px; margin: 26px auto 18px; max-width: 420px; }
+.big-btn {
+  border: none; border-radius: 16px;
+  padding: 20px 24px; font-size: 19px; font-weight: 700;
+  background: var(--card); color: var(--ink);
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+.big-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(38, 50, 74, 0.14); }
+.big-btn:active { transform: scale(0.98); }
+.big-btn .ico { font-size: 26px; }
+.big-btn.green { background: linear-gradient(135deg, #37b24d, #2b8a3e); color: #fff; }
+.big-btn.blue { background: linear-gradient(135deg, #4c6ef5, #3b5bdb); color: #fff; }
+.big-btn.orange { background: linear-gradient(135deg, #fd7e14, #e8590c); color: #fff; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+.toolbar .btn { background: var(--card); color: var(--ink); border: 1px solid var(--border); box-shadow: none; }
+
+/* ---------- 设置页 ---------- */
+.panel {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px 20px; margin-top: 16px;
+}
+.panel h2 { margin: 0 0 6px; font-size: 22px; }
+.panel .desc { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip {
+  border: 2px solid var(--border); background: var(--card); border-radius: 999px;
+  padding: 10px 18px; font-size: 15px; font-weight: 600; color: var(--ink);
+}
+.chip.active { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+.countrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.countrow label { font-weight: 600; }
+.countrow input[type="number"] {
+  width: 110px; padding: 10px 12px; font-size: 18px; font-weight: 700;
+  border: 2px solid var(--border); border-radius: 12px; text-align: center;
+  background: var(--card); color: var(--ink);
+}
+.countrow input[type="number"]:focus { outline: none; border-color: var(--primary); }
+.countrow .max { color: var(--muted); font-size: 14px; }
+.presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.preset {
+  border: 1px solid var(--border); background: var(--card); border-radius: 10px;
+  padding: 8px 16px; font-size: 14px; color: var(--ink);
+}
+.preset.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.setup-actions { display: flex; gap: 12px; align-items: center; }
+
+/* ---------- 答题页 ---------- */
+.quiz-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; color: var(--muted); font-size: 14px; font-weight: 600;
+  flex-wrap: wrap; gap: 6px;
+}
+.quiz-top-right { display: inline-flex; align-items: center; gap: 6px; }
+.quiz-top .score { color: var(--primary); }
+.exit-btn {
+  border: 1px solid var(--red); background: var(--card); color: var(--red);
+  border-radius: 8px; padding: 2px 10px; font-size: 12px; font-weight: 700;
+  transition: background 0.12s ease;
+}
+.exit-btn:hover { background: var(--red-soft); }
+.progressbar {
+  height: 8px; background: var(--border); border-radius: 99px;
+  overflow: hidden; margin-bottom: 14px;
+}
+.progressbar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #4c6ef5, #37b24d);
+  border-radius: 99px; transition: width 0.3s ease;
+}
+.qcard { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 20px; }
+.qmeta { font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.qstem { font-size: 17px; font-weight: 600; margin-bottom: 16px; white-space: pre-wrap; word-break: break-word; }
+.qstem.hint { font-size: 14px; font-weight: 400; color: var(--muted); }
+.qstem.code {
+  font-family: var(--mono); font-size: 14px; font-weight: 400;
+  background: var(--primary-soft); border-radius: 10px; padding: 10px 12px;
+}
+.qanalysis {
+  margin-top: 16px; padding: 12px 14px; background: var(--primary-soft);
+  border-radius: 10px; font-size: 14px; color: var(--ink); white-space: pre-wrap; word-break: break-word;
+}
+.qanswer {
+  margin-top: 14px; padding: 10px 14px; background: var(--green-soft);
+  border-radius: 10px; font-size: 15px; color: var(--green); font-weight: 700;
+}
+
+/* 选择题 */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.opt {
+  text-align: left; border: 2px solid var(--border); background: var(--card);
+  border-radius: 12px; padding: 13px 16px; font-size: 16px; color: var(--ink);
+  white-space: pre-wrap; word-break: break-word;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.opt:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-soft); }
+.opt:disabled { cursor: default; }
+.opt.right { border-color: var(--green); background: var(--green-soft); font-weight: 700; }
+.opt.wrong { border-color: var(--red); background: var(--red-soft); }
+
+/* 代码块（语法着色） */
+.codebox {
+  background: var(--code-bg); border-radius: 12px; overflow-x: auto;
+  font-family: var(--mono); font-size: 14px; line-height: 1.55;
+  max-height: 420px; overflow-y: auto; margin-bottom: 16px;
+}
+.code-line { display: flex; color: #d6dce8; }
+.code-line .ln {
+  flex: 0 0 40px; text-align: right; padding: 2px 10px 2px 0;
+  color: #5c6a84; user-select: none; border-right: 1px solid #2c3446;
+  margin-right: 12px;
+}
+.code-line pre { margin: 0; padding: 2px 14px 2px 0; white-space: pre; font-family: inherit; }
+.code-line pre .k { color: #ff8fb3; }
+.code-line pre .s { color: #9ece6a; }
+.code-line pre .n { color: #ffd28a; }
+.code-line pre .c { color: #5c6a84; font-style: italic; }
+.code-line pre .p { color: #7aa2f7; }
+.codebox.clickable .code-line { cursor: pointer; }
+.codebox.clickable .code-line:hover { background: #272e3e; }
+.codebox.clickable .code-line.sel { background: #33426b; }
+.codebox.clickable .code-line.sel .ln { color: #93a7ff; }
+
+/* 改错修改面板 */
+.fixpanel { border: 1px dashed var(--border); border-radius: 12px; padding: 12px; margin-bottom: 14px; }
+.fixpanel .fp-title { font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.fixrow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.fixrow .tag {
+  flex: 0 0 auto; background: var(--primary-soft); color: var(--primary);
+  font-weight: 700; font-size: 13px; border-radius: 8px; padding: 4px 10px;
+}
+.fixrow .src {
+  flex: 0 0 auto; font-family: var(--mono); font-size: 13px; color: var(--muted);
+  max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fixrow input {
+  flex: 1 1 200px; min-width: 160px; font-family: var(--mono); font-size: 14px;
+  border: 2px solid var(--border); border-radius: 10px; padding: 9px 12px;
+  background: var(--card); color: var(--ink);
+}
+.fixrow input:focus { outline: none; border-color: var(--primary); }
+.fixrow .rm { border: none; background: none; color: var(--muted); font-size: 16px; }
+.fixrow .rm:hover { color: var(--red); }
+
+/* 填空输入 */
+.blank-input {
+  font-family: var(--mono); font-size: 13px; border: 2px solid var(--primary);
+  border-radius: 8px; padding: 4px 8px; margin: 0 2px; background: var(--card); color: var(--ink);
+  max-width: 100%;
+}
+.blank-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.25); }
+.blank-input.ok { border-color: var(--green); background: var(--green-soft); }
+.blank-input.lt { border-color: var(--yellow); background: var(--yellow-soft); }
+.blank-input.bad { border-color: var(--red); background: var(--red-soft); }
+.blank-tip { font-family: var(--mono); font-size: 12px; margin-left: 6px; font-weight: 700; }
+.blank-tip.ok { color: var(--green); }
+.blank-tip.lt { color: var(--yellow); }
+.blank-tip.bad { color: var(--red); }
+
+/* 判分反馈 */
+.feedback { margin-top: 16px; }
+.fb-item {
+  display: flex; gap: 10px; align-items: baseline;
+  border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px;
+}
+.fb-item .code { font-family: var(--mono); word-break: break-all; }
+.fb-item.ok { background: var(--green-soft); color: var(--green); }
+.fb-item.lt { background: var(--yellow-soft); color: var(--yellow); }
+.fb-item.bad { background: var(--red-soft); color: var(--red); }
+.fb-item.warn { background: var(--yellow-soft); color: var(--yellow); }
+.fb-item.blue { background: var(--primary-soft); color: var(--ink); }
+.fb-item.fw { background: var(--red-soft); color: var(--red); }
+.fb-remind { margin-top: 10px; }
+.qactions { display: flex; gap: 12px; margin-top: 18px; }
+
+/* ---------- 结果页 ---------- */
+.result-score { text-align: center; padding: 10px 0 4px; }
+.result-score .big { font-size: 44px; font-weight: 800; }
+.result-score .big.good { color: var(--green); }
+.result-score .big.bad { color: var(--red); }
+.result-score .note { color: var(--muted); font-size: 15px; }
+.result-tools {
+  display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; flex-wrap: wrap;
+}
+.result-hint { font-size: 12px; color: var(--muted); }
+.result-list { margin: 6px 0 18px; }
+.r-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  margin-bottom: 8px; font-size: 14px; cursor: pointer;
+  transition: border-color 0.12s ease;
+}
+.r-item:hover { border-color: var(--primary); }
+.r-item .mark { font-weight: 800; font-size: 16px; }
+.r-item .mark.ok { color: var(--green); }
+.r-item .mark.no { color: var(--red); }
+.r-item .tid { font-family: var(--mono); font-weight: 700; }
+.r-item .ttype { color: var(--muted); font-size: 13px; }
+.r-item .arrow { margin-left: auto; color: var(--muted); font-size: 12px; }
+.r-detail {
+  background: var(--primary-soft); border-radius: 10px; padding: 12px 14px;
+  margin: -4px 0 10px; font-size: 14px; display: none;
+}
+.r-detail.open { display: block; }
+.rd-stem { font-weight: 600; margin-bottom: 8px; white-space: pre-wrap; word-break: break-word; }
+.rd-code {
+  background: var(--code-bg); color: #d6dce8; border-radius: 10px;
+  padding: 10px 12px; overflow-x: auto; font-family: var(--mono); font-size: 13px;
+  line-height: 1.5; margin: 8px 0; white-space: pre;
+}
+.rd-code .k { color: #ff8fb3; } .rd-code .s { color: #9ece6a; }
+.rd-code .n { color: #ffd28a; } .rd-code .c { color: #5c6a84; font-style: italic; }
+.rd-code .p { color: #7aa2f7; }
+.rd-answer { font-weight: 700; color: var(--green); margin: 8px 0 4px; }
+.rd-fix { font-family: var(--mono); font-size: 13px; margin: 2px 0 2px 8px; word-break: break-all; }
+.rd-analysis { margin-top: 8px; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+.result-actions { display: flex; gap: 12px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+
+/* ---------- 统计 ---------- */
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); }
+.stat-card .num { font-size: 26px; font-weight: 800; color: var(--primary); }
+.stat-card .lab { font-size: 13px; color: var(--muted); }
+.bar-chart {
+  display: flex; align-items: flex-end; gap: 8px; height: 130px;
+  padding: 10px 6px 0; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; margin-bottom: 16px;
+}
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-stack { width: 60%; max-width: 34px; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 4px 4px 0 0; overflow: hidden; }
+.bar-answered { background: var(--primary-soft); }
+.bar-correct { background: var(--green); }
+.bar-label { font-size: 11px; color: var(--muted); }
+.bar-num { font-size: 10px; color: var(--muted); }
+.wrong-anal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; }
+.wrong-anal .wa-row { display: flex; justify-content: space-between; padding: 5px 2px; border-bottom: 1px dashed var(--border); }
+.wrong-anal .wa-row:last-child { border-bottom: none; }
+.hist { font-size: 13px; }
+.hist-item { display: flex; justify-content: space-between; padding: 6px 2px; border-bottom: 1px dashed var(--border); color: var(--muted); }
+.hist-item .mark.ok { color: var(--green); font-weight: 800; }
+.hist-item .mark.no { color: var(--red); font-weight: 800; }
+
+/* ---------- 错题本 ---------- */
+.wrong-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.wrong-item .info { flex: 1; }
+.wrong-item .sub { font-size: 12px; color: var(--muted); }
+.wrong-item .lvl { font-size: 12px; color: var(--yellow); font-weight: 700; }
+.wrong-item .due { font-size: 12px; color: var(--green); font-weight: 700; }
+
+/* ---------- 收藏 ---------- */
+.qhead-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; margin-bottom: 8px;
+}
+.qhead-row .qmeta { margin-bottom: 0; }
+.fav-btn {
+  border: 1px solid var(--border); background: var(--card); color: var(--yellow);
+  border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700;
+  flex: 0 0 auto; transition: all 0.12s ease;
+}
+.fav-btn:hover { border-color: var(--yellow); }
+.fav-btn.on { background: var(--yellow-soft); border-color: var(--yellow); }
+.r-item .fav-btn { margin-left: auto; }
+.r-item .arrow { margin-left: 10px; }
+
+/* ---------- 新手提示 ---------- */
+.tips-box {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--primary-soft); border: 1px solid var(--primary);
+  color: var(--ink); border-radius: 12px; padding: 10px 14px;
+  margin-bottom: 14px; font-size: 14px;
+}
+.tips-box .tips-text { flex: 1; }
+.tips-close { border: none; background: none; color: var(--muted); font-size: 14px; padding: 2px 6px; }
+.tips-close:hover { color: var(--primary); }
+
+/* ---------- 设置 ---------- */
+.set-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; padding: 13px 2px; border-bottom: 1px dashed var(--border);
+  font-size: 15px; flex-wrap: wrap;
+}
+.set-row:last-of-type { border-bottom: none; }
+.set-row .set-note { color: var(--muted); font-size: 13px; max-width: 420px; }
+.set-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.set-actions .btn { background: var(--card); color: var(--ink); border: 1px solid var(--border); box-shadow: none; }
+.set-actions .btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ---------- 统一弹窗 ---------- */
+#modal-mask {
+  position: fixed; inset: 0; background: rgba(15, 20, 32, 0.55);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+  padding: 20px;
+}
+.modal {
+  background: var(--card); border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 24px; max-width: 420px; width: 100%;
+}
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+.modal-msg { font-size: 15px; color: var(--muted); margin-bottom: 20px; word-break: break-word; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+/* ---------- toast ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(20px);
+  background: #26324a; color: #fff; padding: 12px 22px; border-radius: 999px;
+  font-size: 15px; opacity: 0; pointer-events: none; transition: all 0.25s ease;
+  z-index: 99; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 90vw;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 520px) {
+  .hero h1 { font-size: 34px; }
+  .qstem { font-size: 15.5px; }
+  .codebox { font-size: 12.5px; }
+  .code-line .ln { flex-basis: 30px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .btn { font-size: 15px; }
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 新手提示条（可设置关闭） -->
+  <div class="tips-box hidden" id="tips-box">
+    <span class="tips-text" id="tips-text"></span>
+    <button class="tips-close" id="tips-close" title="关闭提示">✕</button>
+  </div>
+
+  <!-- ============ 主页 ============ -->
+  <section id="view-home">
+    <header class="hero">
+      <h1>🐉 C_KING</h1>
+      <p class="sub">C 语言题库抽查系统</p>
+      <p class="foot">v1.2 · 选择题 118 题 · 程序改错 10 题 · 程序填空 17 题 · 作者：龙神霸天</p>
+    </header>
+    <div class="menu">
+      <button class="big-btn blue" id="btn-random"><span class="ico">🎲</span>随机抽题</button>
+      <button class="big-btn orange" id="btn-type"><span class="ico">📚</span>按题型抽题</button>
+      <button class="big-btn green" id="btn-wrong"><span class="ico">📖</span>错题重练</button>
+    </div>
+    <div class="toolbar">
+      <button class="btn small" id="btn-stats">📊 统计</button>
+      <button class="btn small" id="btn-wronglist">🗂 错题本</button>
+      <button class="btn small" id="btn-favlist">⭐ 收藏夹</button>
+      <button class="btn small" id="btn-settings">⚙️ 设置</button>
+    </div>
+  </section>
+
+  <!-- ============ 出题设置 ============ -->
+  <section id="view-setup" class="hidden">
+    <div class="panel">
+      <h2 id="setup-title"></h2>
+      <p class="desc" id="setup-desc"></p>
+      <div id="setup-chips" class="chips hidden"></div>
+      <div class="countrow">
+        <label>题目数量</label>
+        <input type="number" id="setup-count" min="1" value="10">
+        <span class="max" id="setup-max"></span>
+      </div>
+      <div class="presets" id="setup-presets"></div>
+      <div class="setup-actions">
+        <button class="btn primary" id="btn-start">开始抽查 🚀</button>
+        <button class="btn ghost small" id="btn-setup-back">← 返回</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 答题 ============ -->
+  <section id="view-quiz" class="hidden">
+    <div class="quiz-top">
+      <span id="quiz-progress"></span>
+      <span class="quiz-top-right">
+        <span class="score" id="quiz-score"></span>
+        <button class="exit-btn" id="btn-quit" title="退出本次练习">✖ 退出</button>
+      </span>
+    </div>
+    <div class="progressbar"><div class="progressbar-fill" id="quiz-progress-fill"></div></div>
+    <div id="quiz-body"></div>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section id="view-result" class="hidden">
+    <div class="panel">
+      <div class="result-score">
+        <div class="big" id="result-big"></div>
+        <div class="note" id="result-note"></div>
+      </div>
+      <div class="result-tools">
+        <button class="btn small" id="btn-wrong-only">🙈 只看错题</button>
+        <span class="result-hint" id="result-hint">（点击题目行可复盘原题与答案解析，⭐ 可收藏）</span>
+      </div>
+      <div class="result-list" id="result-list"></div>
+      <div class="result-actions">
+        <button class="btn primary" id="btn-again">🔁 再来一组</button>
+        <button class="btn ghost" id="btn-home">🏠 回主页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 统计 ============ -->
+  <section id="view-stats" class="hidden">
+    <div class="panel">
+      <h2>📊 学习统计</h2>
+      <div class="stat-grid" id="stat-grid"></div>
+      <h3 style="margin:18px 0 8px;font-size:16px;">最近 7 天答题量</h3>
+      <div class="bar-chart" id="stat-chart"></div>
+      <h3 style="margin:18px 0 8px;font-size:16px;">错题分析</h3>
+      <div class="wrong-anal" id="stat-wrong-anal"></div>
+      <h3 style="margin:18px 0 8px;font-size:16px;">最近记录</h3>
+      <div class="hist" id="stat-hist"></div>
+      <div class="setup-actions" style="margin-top:18px;">
+        <button class="btn ghost small" id="btn-stats-back">← 返回</button>
+        <button class="btn small" id="btn-stats-clear" style="background:#fff;border:1px solid var(--red);color:var(--red);">🗑 清空统计</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 错题本 ============ -->
+  <section id="view-wrong" class="hidden">
+    <div class="panel">
+      <h2>🗂 错题本</h2>
+      <p class="desc">答错的题会收录在这里，答对后自动移出；点击题目可复盘，⭐ 可收藏。</p>
+      <div id="wrong-list"></div>
+      <div class="setup-actions" style="margin-top:18px;">
+        <button class="btn primary" id="btn-wrong-practice">📖 重练错题</button>
+        <button class="btn ghost small" id="btn-wrong-back">← 返回</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 收藏夹 ============ -->
+  <section id="view-favorites" class="hidden">
+    <div class="panel">
+      <h2>⭐ 收藏夹</h2>
+      <p class="desc">收藏的题会收录在这里：做题中、结果页、错题本里点 ⭐ 即可收藏/取消；点击题目可复盘。</p>
+      <div id="fav-list"></div>
+      <div class="setup-actions" style="margin-top:18px;">
+        <button class="btn primary" id="btn-fav-practice">⭐ 重练收藏</button>
+        <button class="btn ghost small" id="btn-fav-back">← 返回</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section id="view-settings" class="hidden">
+    <div class="panel">
+      <h2>⚙️ 设置</h2>
+      <div class="set-row">
+        <span>外观</span>
+        <button class="btn small" id="btn-theme">🌙 夜间</button>
+      </div>
+      <div class="set-row">
+        <span>新手提示</span>
+        <button class="btn small" id="btn-tips">✅ 开启</button>
+      </div>
+      <div class="set-row">
+        <span>学习记录</span>
+        <span class="set-actions">
+          <button class="btn small" id="btn-export">⬆ 导出记录</button>
+          <button class="btn small" id="btn-import">⬇ 导入记录</button>
+        </span>
+      </div>
+      <div class="set-row">
+        <span>版本</span>
+        <span class="set-note">v1.2</span>
+      </div>
+      <div class="set-row">
+        <span>作者</span>
+        <span class="set-note">龙神霸天 🐉</span>
+      </div>
+      <div class="set-row">
+        <span>说明</span>
+        <span class="set-note">学习记录保存在本机浏览器；换设备时用「导出 → 导入」迁移，支持覆盖/合并。</span>
+      </div>
+      <div class="setup-actions" style="margin-top:18px;">
+        <button class="btn ghost small" id="btn-settings-back">← 返回</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 统一确认弹窗 -->
+<div id="modal-mask" class="hidden">
+  <div class="modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="import-file" accept="application/json" class="hidden">
+<script>
+// 由 tools/parse_txt.py 自动生成，请勿手改；修改题库后重新运行 python tools/parse_txt.py
+(function (g) { g.CK_DATA = {
+ "meta": {
+  "name": "C_KING C语言题库",
+  "choiceCount": 118,
+  "fixCount": 10,
+  "blankCount": 17,
+  "total": 145
+ },
+ "choice": [
+  {
+   "id": "1",
+   "stem": "下列选项中，不能用作标识符的是",
+   "options": {
+    "A": "_1234",
+    "B": "_1",
+    "C": "int",
+    "D": "_2"
+   },
+   "answer": "C",
+   "analysis": "int 是 C 语言关键字，不能用作标识符；_2、_1、_1234 均以下划线开头，是合法标识符。"
+  },
+  {
+   "id": "2",
+   "stem": "以下选项中不合法的用户标识符是",
+   "options": {
+    "A": "abc.c",
+    "B": "file",
+    "C": "Main",
+    "D": "PRONTF"
+   },
+   "answer": "A",
+   "analysis": "标识符只能由字母、数字、下划线组成且不能以数字开头；abc.c 含小数点，不合法。C 语言区分大小写，Main、PRONTF 均合法。"
+  },
+  {
+   "id": "3",
+   "stem": "下列变量定义中合法的是",
+   "options": {
+    "A": "short _a=1-1e-1;",
+    "B": "double b=1+5e2.5;",
+    "C": "long do=0xfdaL;",
+    "D": "float 2_and=1-e-1;"
+   },
+   "answer": "A",
+   "analysis": "B 中 5e2.5 的指数不是整数，非法；C 中 do 是关键字，不能作变量名；D 以数字 2 开头，非法。A 合法（1e-1 是合法浮点常量）。"
+  },
+  {
+   "id": "4",
+   "stem": "下列关于C语言用户标识符的叙述中正确的是",
+   "options": {
+    "A": "用户标识符中可以出现下划线和中划线（减号）",
+    "B": "用户标识符中不可以出现中划线，但可以出现下划线",
+    "C": "用户标识符中可以出现下划线，但不可以放在用户标识符的开头",
+    "D": "可以出现下划线和数字,都可以放在用户标识符的开头"
+   },
+   "answer": "B",
+   "analysis": "标识符可含字母、数字、下划线，不能含中划线（减号），且下划线可作开头、数字不能作开头。"
+  },
+  {
+   "id": "5",
+   "stem": "#include <stdio.h> main() { printf(\"%d\\n\",NULL); } 程序运行后的输出结果是",
+   "options": {
+    "A": "0",
+    "B": "1",
+    "C": "-1",
+    "D": "NULL没定义，出错"
+   },
+   "answer": "A",
+   "analysis": "stdio.h 中 NULL 定义为 0，printf(\"%d\",NULL) 输出 0。"
+  },
+  {
+   "id": "6",
+   "stem": "在C语言中，下列不正确的转义字符是",
+   "options": {
+    "A": "'\\\\'",
+    "B": "'\\t'",
+    "C": "'074'",
+    "D": "'\\0'"
+   },
+   "answer": "C",
+   "analysis": "转义字符以反斜杠开头。'074' 缺反斜杠不是转义字符；'\\\\'、'\\t'、'\\0' 都是合法转义（\\0 表示空字符）。"
+  },
+  {
+   "id": "7",
+   "stem": "以下C语言常量中，错误的是",
+   "options": {
+    "A": "0xFF",
+    "B": "1.2e0.5",
+    "C": "2L",
+    "D": "'\\72'"
+   },
+   "answer": "B",
+   "analysis": "浮点常量的指数必须是整数，1.2e0.5 指数 0.5 非法；0xFF 是十六进制常量，2L 是长整型，'\\72' 是八进制转义字符，均合法。"
+  },
+  {
+   "id": "8",
+   "stem": "若变量a是int类型，并执行了语句：a='A'+1.6；，则正确的叙述是",
+   "options": {
+    "A": "a的值是字符C",
+    "B": "a的值是浮点型",
+    "C": "不允许字符型和浮点型相加",
+    "D": "a的值是'A'的ASCII值加上1"
+   },
+   "answer": "D",
+   "analysis": "'A'=65，65+1.6=66.6，赋给 int 型 a 时截断为 66，即 'A' 的 ASCII 值加 1。"
+  },
+  {
+   "id": "9",
+   "stem": "在C语言中，下面有关for循环的正确描述是",
+   "options": {
+    "A": "for循环只能用于循环次数已经确定的情况",
+    "B": "for循环是先执行循环体语句，后判断表达式",
+    "C": "在for循环中，不能用break语句跳出循环体",
+    "D": "循环体可以包含多条语句，但必须用花括号括起来"
+   },
+   "answer": "D",
+   "analysis": "for 循环先判断后执行（B 错），次数可不定（A 错），可用 break 跳出（C 错）；循环体多条语句必须用花括号（D 对）。"
+  },
+  {
+   "id": "10",
+   "stem": "在C语言中，____是不合法的变量说明。",
+   "options": {
+    "A": "int a1,a2=061",
+    "B": "char C[]={'A','B'}",
+    "C": "long a,b",
+    "D": "int m=n=20"
+   },
+   "answer": "D",
+   "analysis": "int m=n=20 中 n 未声明，非法；其余均合法（061 是八进制常量，C[] 合法字符数组）。"
+  },
+  {
+   "id": "11",
+   "stem": "以下合法的赋值语句是",
+   "options": {
+    "A": "x+y=100;",
+    "B": "d--;",
+    "C": "x+y;",
+    "D": "c=int(a+b)"
+   },
+   "answer": "B",
+   "analysis": "x+y 不是左值，A 非法；x+y; 不是赋值语句；C 语言强制转换应写作 (int)(a+b)，D 写法非法；d-- 是合法赋值语句。"
+  },
+  {
+   "id": "12",
+   "stem": "在C语言中，以下叙述正确的是",
+   "options": {
+    "A": "函数可以嵌套定义但不能嵌套调用",
+    "B": "函数既可以嵌套调用也可以嵌套定义",
+    "C": "函数既不可以嵌套定义也不可以嵌套调用",
+    "D": "函数可以嵌套调用但不可以嵌套定义"
+   },
+   "answer": "D",
+   "analysis": "C 语言允许函数嵌套调用，但不允许在一个函数内部定义另一个函数。"
+  },
+  {
+   "id": "13",
+   "stem": "已知大写字母A的ASCII码值是65，小写字母a的ASCII码是97，用八进制表示的字符常量'\\101'是",
+   "options": {
+    "A": "字符A",
+    "B": "字符a",
+    "C": "字符e",
+    "D": "非法的常量"
+   },
+   "answer": "A",
+   "analysis": "\\101 是八进制转义，101(八进制)=65(十进制)，即字符 'A'。"
+  },
+  {
+   "id": "14",
+   "stem": "在C语言中，已知：int x=15, y=5；则执行以下语句后的输出为 printf(\"%d\\n\", x%=(y%=2));",
+   "options": {
+    "A": "0",
+    "B": "1",
+    "C": "6",
+    "D": "12"
+   },
+   "answer": "A",
+   "analysis": "y%=2 得 y=1，x%=1 得 x=0，输出 0。"
+  },
+  {
+   "id": "15",
+   "stem": "在C语言中，以下程序的输出结果是 main() { int a=4,b=5,c=0,d; d=!a&&!b||!c; printf(\"%d\\n\",d); }",
+   "options": {
+    "A": "1",
+    "B": "0",
+    "C": "非0的数",
+    "D": "-1"
+   },
+   "answer": "A",
+   "analysis": "!a=0、!b=0、!c=1，0&&0||1=1，输出 1。"
+  },
+  {
+   "id": "16",
+   "stem": "若已定义x和y为double类型,则表达式:x=1,y=x+3/2的值是",
+   "options": {
+    "A": "1",
+    "B": "2",
+    "C": "2.0",
+    "D": "2.5"
+   },
+   "answer": "C",
+   "analysis": "3/2 是整数除法得 1，y=1.0+1=2.0（double 型）。"
+  },
+  {
+   "id": "17",
+   "stem": "在C语言中，以下程序的输出结果是 main() { int a=12,b=12; printf(\"%d %d\\n\",--a,++b); }",
+   "options": {
+    "A": "10 10",
+    "B": "12 12",
+    "C": "11 10",
+    "D": "11 13"
+   },
+   "answer": "D",
+   "analysis": "--a 先自减得 11；++b 先自增得 13；输出 11 13。"
+  },
+  {
+   "id": "18",
+   "stem": "有定义语句：int x, y;，若要通过 scanf(\"%d,%d\",&x,&y);语句使变量x得到数值11，变量y得到数值12，下面四组输入形式中，错误的是",
+   "options": {
+    "A": "11 12<回车>",
+    "B": "11, 12<回车>",
+    "C": "11,12<回车>",
+    "D": "11,<回车>12<回车>"
+   },
+   "answer": "A",
+   "analysis": "格式串 \"%d,%d\" 中带逗号，输入必须与格式匹配（带逗号）；\"11 12\" 没有逗号，y 读不到，是错误的输入形式。"
+  },
+  {
+   "id": "19",
+   "stem": "在C语言中，若a=21，则 printf(\"%o\",a);输出值为",
+   "options": {
+    "A": "17",
+    "B": "25",
+    "C": "33",
+    "D": "21"
+   },
+   "answer": "B",
+   "analysis": "%o 按八进制输出，21 的八进制为 25。"
+  },
+  {
+   "id": "20",
+   "stem": "有以下程序 main() { int a,b,d=25; a=d/10%9;b=a&&(-1); printf(\"%d,%d\\n\",a,b); } 程序运行后的输出结果是",
+   "options": {
+    "A": "6，1",
+    "B": "2，1",
+    "C": "6，0",
+    "D": "2，0"
+   },
+   "answer": "B",
+   "analysis": "d/10=2，2%9=2，故 a=2；b=2&&(-1)=1；输出 2,1。"
+  },
+  {
+   "id": "21",
+   "stem": "语句 printf(\"a\\bre\\'hi\\'y\\\\\\bou\\n\"); 的输出结果是",
+   "options": {
+    "A": "a\\bre\\'hi\\'y\\\\\\bou",
+    "B": "a\\bre\\'hi\\'y\\bou",
+    "C": "re'hi'you",
+    "D": "abre'hi'y\\bou"
+   },
+   "answer": "C",
+   "analysis": "\\b 退格消除前一字符（消掉 a 和 \\），\\' 输出单引号，\\\\ 输出反斜杠后再被 \\b 消除，最终输出 re'hi'you。"
+  },
+  {
+   "id": "22",
+   "stem": "若有以下类型说明语句 char w; int x; float y; double z; 则表达式 w*x+z-y 的结果是（）类型。",
+   "options": {
+    "A": "float",
+    "B": "char",
+    "C": "int",
+    "D": "double"
+   },
+   "answer": "D",
+   "analysis": "混合运算中自动向精度最高的类型转换，double 精度最高，结果为 double。"
+  },
+  {
+   "id": "23",
+   "stem": "已知i、j、k为int型变量，若从键盘输入：1，2，3<回车>，使i的值为1、j的值为2、k的值为3，以下选项中正确的输入语句是",
+   "options": {
+    "A": "scanf(\"%2d%2d%2d\",&i,&j,&k);",
+    "B": "scanf(\"%d %d %d\",&i,&j,&k);",
+    "C": "scanf(\"%d,%d,%d\",&i,&j,&k);",
+    "D": "scanf(\"i=%d,j=%d,k=%d\",&i,&j,&k);"
+   },
+   "answer": "C",
+   "analysis": "输入是 \"1,2,3\"（带逗号），格式串必须含逗号，选 %d,%d,%d。"
+  },
+  {
+   "id": "24",
+   "stem": "在C语言中，语句：int a=0,b=0; printf(\"%d\",(a=2)&&(b=-2)); 的输出结果是",
+   "options": {
+    "A": "无输出",
+    "B": "结果不确定",
+    "C": "-1",
+    "D": "1"
+   },
+   "answer": "D",
+   "analysis": "(a=2)=2 非零，(b=-2)=-2 非零，2&&-2=1，输出 1。"
+  },
+  {
+   "id": "25",
+   "stem": "设有 int x=11; 则表达式 (x++ * 1/3) 的值是",
+   "options": {
+    "A": "3",
+    "B": "4",
+    "C": "11",
+    "D": "12"
+   },
+   "answer": "A",
+   "analysis": "x++ 先取原值 11，11*1/3=3（整数除法）。"
+  },
+  {
+   "id": "26",
+   "stem": "main() { int k=2,i=2,m; m=(k+=i*=k); printf(\"%d,%d\\n\",m,i); } 执行后的输出结果是",
+   "options": {
+    "A": "8，6",
+    "B": "8，3",
+    "C": "6，4",
+    "D": "7，4"
+   },
+   "answer": "C",
+   "analysis": "i*=k 得 i=4；k+=i 得 k=6；m=6，输出 6,4。"
+  },
+  {
+   "id": "27",
+   "stem": "有以下程序 main() { int i=1,j=2,k=3; if(i++==1&&(++j==3||k++==3)) printf(\"%d %d %d\\n\",i,j,k); } 程序运行后的输出结果是",
+   "options": {
+    "A": "1 2 3",
+    "B": "2 3 4",
+    "C": "2 2 3",
+    "D": "2 3 3"
+   },
+   "answer": "D",
+   "analysis": "i++==1 真（i 变 2）；++j==3 真（j=3）；|| 短路，k++ 不执行，k 仍为 3；输出 2 3 3。"
+  },
+  {
+   "id": "28",
+   "stem": "以下程序的输出结果是 main() {int a=10,b=10; printf(\"%d %d\\n\",--a,b--); }",
+   "options": {
+    "A": "10 10",
+    "B": "9 10",
+    "C": "11 10",
+    "D": "11 12"
+   },
+   "answer": "B",
+   "analysis": "--a 先自减得 9；b-- 先取原值 10 输出后再自减；输出 9 10。"
+  },
+  {
+   "id": "29",
+   "stem": "在C语言中，设x，y均为整型变量，且x=11 y=4，则以下语句的输出结果是 printf(\"%d,%d\\n\",x--,--y);",
+   "options": {
+    "A": "11，3",
+    "B": "11，4",
+    "C": "10，3",
+    "D": "10，4"
+   },
+   "answer": "A",
+   "analysis": "x-- 先取原值 11 输出；--y 先自减得 3；输出 11,3。"
+  },
+  {
+   "id": "30",
+   "stem": "若有int x=4,y=5;, 则执行完表达式x*=y-1后，x值为",
+   "options": {
+    "A": "16",
+    "B": "0",
+    "C": "1",
+    "D": "19"
+   },
+   "answer": "A",
+   "analysis": "x*=y-1 即 x=x*(5-1)=4*4=16。"
+  },
+  {
+   "id": "31",
+   "stem": "在C语言中，以下程序的输出结果是 main() { int x=20; do { printf(\"%d\",++x);} while(!x); }",
+   "options": {
+    "A": "20",
+    "B": "21",
+    "C": "10",
+    "D": "22"
+   },
+   "answer": "B",
+   "analysis": "++x 得 21 并输出；!21=0 为假，循环结束；输出 21。"
+  },
+  {
+   "id": "32",
+   "stem": "若x=2, y=2, z=2 则表达式 z+=++x+y++ 的值为",
+   "options": {
+    "A": "5",
+    "B": "6",
+    "C": "7",
+    "D": "8"
+   },
+   "answer": "C",
+   "analysis": "++x=3，y++ 取原值 2，z=2+3+2=7。"
+  },
+  {
+   "id": "33",
+   "stem": "若有说明和语句: int a=8; int c=++a; 此处表达式c的值是",
+   "options": {
+    "A": "7",
+    "B": "9",
+    "C": "10",
+    "D": "6"
+   },
+   "answer": "B",
+   "analysis": "++a 先自增，a=9，c=9。"
+  },
+  {
+   "id": "34",
+   "stem": "执行以下程序段后、变量a,b,c的值分别是 int x=10,y=9; int a,b,c; a=(--x==y++)?--x:++y; b=x++; c=y;",
+   "options": {
+    "A": "a=9,b=9,c=9",
+    "B": "a=8,b=8,c=10",
+    "C": "a=9,b=10,c=9",
+    "D": "a=1,b=11,c=10"
+   },
+   "answer": "B",
+   "analysis": "--x=9，y++=9 相等为真，取 --x=8；a=8；b=x++=8（x 变 9）；c=y=10。"
+  },
+  {
+   "id": "35",
+   "stem": "执行以下语句后a的值为 int a,b,c; a=b=c=1; ++a||++b&&++c;",
+   "options": {
+    "A": "错误",
+    "B": "0",
+    "C": "2",
+    "D": "1"
+   },
+   "answer": "C",
+   "analysis": "++a=2 非零为真，|| 短路，++b、++c 不执行；a=2。"
+  },
+  {
+   "id": "36",
+   "stem": "设 int x=1, y=1; 表达式(!x||y--)的值是",
+   "options": {
+    "A": "0",
+    "B": "1",
+    "C": "2",
+    "D": "-1"
+   },
+   "answer": "B",
+   "analysis": "!x=0；y-- 取原值 1（后自减）；0||1=1。"
+  },
+  {
+   "id": "37",
+   "stem": "若已定义x和y为double类型，则表达式x=1，y=x+3/2 的值是",
+   "options": {
+    "A": "1",
+    "B": "2",
+    "C": "2.0",
+    "D": "2.5"
+   },
+   "answer": "C",
+   "analysis": "同第 16 题，3/2=1，y=2.0。"
+  },
+  {
+   "id": "38",
+   "stem": "下列程序的输出结果是 main() { double d=3.2; int x,y; x=1.2; y=(x+3.8)/5.0; printf(\"%d \\n\", d*y); }",
+   "options": {
+    "A": "3",
+    "B": "3.2",
+    "C": "0",
+    "D": "3.07"
+   },
+   "answer": "C",
+   "analysis": "x=1.2 赋 int 得 1；y=(1+3.8)/5.0=0.96 赋 int 得 0；d*y=0，输出 0。"
+  },
+  {
+   "id": "39",
+   "stem": "设变量说明为 int a=2,b=3,c=7,d=10；则表达式 d=a==b?++b:++c 的值是",
+   "options": {
+    "A": "10",
+    "B": "4",
+    "C": "8",
+    "D": "6"
+   },
+   "answer": "C",
+   "analysis": "a==b 即 2==3 为假，取 ++c=8，d=8。"
+  },
+  {
+   "id": "40",
+   "stem": "以下对i, j, k进行说明并赋值的方法中, 只有（）是错误的。",
+   "options": {
+    "A": "int i=j=k=1;",
+    "B": "int i,j,k; i=j=k=1;",
+    "C": "int i=1,j=1,k=1;",
+    "D": "int i,j,k; i=j=k=1;"
+   },
+   "answer": "A",
+   "analysis": "int i=j=k=1 中 j、k 尚未声明就被使用，非法；B、C、D 均合法（D 先声明 i、j、k，再整体赋值为 1）。"
+  },
+  {
+   "id": "41",
+   "stem": "C语言中运算对象必须是整型的运算符是",
+   "options": {
+    "A": "%=",
+    "B": "/",
+    "C": "&&",
+    "D": "<="
+   },
+   "answer": "A",
+   "analysis": "取余运算 %（及 %=）要求运算对象为整型；/、&&、<= 都可用于浮点。"
+  },
+  {
+   "id": "42",
+   "stem": "在C语言中，以下一组运算符中,优先级最高的运算符是",
+   "options": {
+    "A": "<=",
+    "B": "=",
+    "C": "%",
+    "D": "&&"
+   },
+   "answer": "C",
+   "analysis": "算术运算符 % 优先级高于关系（<=）、逻辑与（&&）和赋值（=）。"
+  },
+  {
+   "id": "43",
+   "stem": "以下选项中非法的表达式是",
+   "options": {
+    "A": "0<=x<100",
+    "B": "i=j==0",
+    "C": "(char)(65+3)",
+    "D": "x+1=x+1"
+   },
+   "answer": "D",
+   "analysis": "x+1 是表达式不是左值，不能作为赋值目标；A、B、C 均合法（A 为连续比较，语法合法）。"
+  },
+  {
+   "id": "44",
+   "stem": "在TC中，已知：int x=15, y=6, z; 则下列语句的输出结果是 printf(\"%d\\n\",x/y);",
+   "options": {
+    "A": "1",
+    "B": "0",
+    "C": "2",
+    "D": "3"
+   },
+   "answer": "C",
+   "analysis": "15/6=2（整数除法）。"
+  },
+  {
+   "id": "45",
+   "stem": "设x=1, y=2, 执行表达式 (x>y)?x++:++y 以后x和y的值分别为",
+   "options": {
+    "A": "1和2",
+    "B": "1和3",
+    "C": "2和2",
+    "D": "2和3"
+   },
+   "answer": "B",
+   "analysis": "x>y 即 1>2 为假，执行 ++y=3；x 不变为 1。"
+  },
+  {
+   "id": "46",
+   "stem": "设x.y.z和k都是int型变量,则执行表达式:x=(y=4,z=16,k=32)后,x的值为",
+   "options": {
+    "A": "4",
+    "B": "16",
+    "C": "32",
+    "D": "52"
+   },
+   "answer": "C",
+   "analysis": "逗号表达式按从左到右求值，取最后一个表达式的值 32。"
+  },
+  {
+   "id": "47",
+   "stem": "下列程序输出的结果是 main() { int a=4; a%=6-1; printf(\"\\n%d,\",a); a+=a*=2; printf(\"%d\",a); }",
+   "options": {
+    "A": "4，16",
+    "B": "5，16",
+    "C": "4，18",
+    "D": "5，18"
+   },
+   "answer": "A",
+   "analysis": "a%=5 得 4；a*=2 得 8，a+=8 得 16；输出 4,16。"
+  },
+  {
+   "id": "48",
+   "stem": "有以下程序 main() { int a,b,d=25; a=d/10%9;b=a&&(-1); printf(\"%d,%d\\n\",a,b); } 程序运行后的输出结果是",
+   "options": {
+    "A": "6，1",
+    "B": "2，1",
+    "C": "6，0",
+    "D": "2，0"
+   },
+   "answer": "B",
+   "analysis": "同第 20 题，a=2，b=2&&(-1)=1。"
+  },
+  {
+   "id": "49",
+   "stem": "以下程序的输出结果是 main() { char c='z'; printf(\"%c\",c-25); }",
+   "options": {
+    "A": "a",
+    "B": "Z",
+    "C": "z-25",
+    "D": "y"
+   },
+   "answer": "A",
+   "analysis": "'z'=122，122-25=97='a'。"
+  },
+  {
+   "id": "50",
+   "stem": "若变量c为char类型，能正确判断出c为小写字母的表达式是",
+   "options": {
+    "A": "'a'<=c<='z'",
+    "B": "(c>='a')||(c<='z')",
+    "C": "(c>='A')&&(c<='Z')",
+    "D": "(c>='a')&&(c<='z')"
+   },
+   "answer": "D",
+   "analysis": "判断小写字母需同时满足 c>='a' 且 c<='z'（&&）；A 是连续比较恒为真，B 用 || 恒为真，C 判断的是大写字母。"
+  },
+  {
+   "id": "51",
+   "stem": "能正确表示逻辑关系：\"a>=10或a<=0\"的C语言表达式是",
+   "options": {
+    "A": "a>=10 or a<=0",
+    "B": "a>=0|a<=10",
+    "C": "a>=10&&a<=0",
+    "D": "a>=10||a<=0"
+   },
+   "answer": "D",
+   "analysis": "\"或\"用 ||，\"且\"用 &&；C 语言没有 or 关键字（那是 Pascal），故 D 正确。"
+  },
+  {
+   "id": "52",
+   "stem": "以下非法的赋值语句是",
+   "options": {
+    "A": "n=(i=2,++i);",
+    "B": "j++;",
+    "C": "++(i+1);",
+    "D": "x=j>0;"
+   },
+   "answer": "C",
+   "analysis": "++ 要求操作数是左值，i+1 是表达式不是左值，++(i+1) 非法；其余均合法。"
+  },
+  {
+   "id": "53",
+   "stem": "假定有以下变量定义: int k=7, x=12; 则能使值为3的表达式是",
+   "options": {
+    "A": "x%=(K%=5)",
+    "B": "x%=(k-k%5)",
+    "C": "x%=k-k%5",
+    "D": "(x%=k)-(k%=5)"
+   },
+   "answer": "D",
+   "analysis": "x%=7 得 5，k%=5 得 2，5-2=3；A 中 K 未定义，B、C 得 12%5=2。"
+  },
+  {
+   "id": "54",
+   "stem": "设x、y、t均为int型变量，则执行语句：x=y=3;t=++x||++y;后，y的值为",
+   "options": {
+    "A": "不定值",
+    "B": "4",
+    "C": "3",
+    "D": "1"
+   },
+   "answer": "C",
+   "analysis": "++x=4 为真，|| 短路，++y 不执行，y 仍为 3。"
+  },
+  {
+   "id": "55",
+   "stem": "有如下程序 main() { float x=2.0,y; if(x<0.0) y=0.0; else if(x<10.0) y=1.0/x; else y=1.0; printf(\"%f\\n\",y); } 该程序的输出结果是",
+   "options": {
+    "A": "0",
+    "B": "0.25",
+    "C": "0.5",
+    "D": "1"
+   },
+   "answer": "C",
+   "analysis": "x=2.0 满足 0<x<10，y=1.0/2.0=0.5。"
+  },
+  {
+   "id": "56",
+   "stem": "阅读以下程序：main() { int x; scanf(\"%d\",&x); if(x--<5) printf(\"%d\",x); else printf(\"%d\",x++); } 程序运行后，如果从键盘上输入5，则输出结果是",
+   "options": {
+    "A": "3",
+    "B": "4",
+    "C": "5",
+    "D": "6"
+   },
+   "answer": "B",
+   "analysis": "5<5 为假（x 先自减为 4），走 else 输出 x++=4。"
+  },
+  {
+   "id": "57",
+   "stem": "有如下程序 main() { int x=1,a=0,b=0; switch(x){ case 0: b++; case 1: a++; case 2: a++;b++; } } 该程序的输出结果是",
+   "options": {
+    "A": "a=2,b=1",
+    "B": "a=1,b=1",
+    "C": "a=1,b=0",
+    "D": "a=2,b=2"
+   },
+   "answer": "A",
+   "analysis": "x=1 从 case 1 进入，无 break 向下贯穿：case1 a++（a=1），case2 a++、b++（a=2,b=1）。"
+  },
+  {
+   "id": "58",
+   "stem": "有以下程序 main() { int i; for(i=0;i<3;i++) switch(i) { case 1: printf(\"%d\",i); case 2: printf(\"%d\",i); default: printf(\"%d\",i); } } 执行后输出的结果是",
+   "options": {
+    "A": "011122",
+    "B": "012",
+    "C": "12020",
+    "D": "12"
+   },
+   "answer": "A",
+   "analysis": "i=0 无 case 0 走 default 输出 0；i=1 贯穿输出 111；i=2 输出 22；共 011122。"
+  },
+  {
+   "id": "59",
+   "stem": "以下程序的运行结果是 main() { int m=5; if(m++>5) printf(\"%d\\n\",m); else printf(\"%d\\n\",m--); }",
+   "options": {
+    "A": "4",
+    "B": "5",
+    "C": "6",
+    "D": "7"
+   },
+   "answer": "C",
+   "analysis": "m++>5 即 5>5 为假，m 已变 6；else 输出 m--=6。"
+  },
+  {
+   "id": "60",
+   "stem": "下列条件语句中，功能与其他语句不同的是",
+   "options": {
+    "A": "if(a) printf(\"%d\\n\",x); else printf(\"%d\\n\",y);",
+    "B": "if(a==0) printf(\"%d\\n\",y); else printf(\"%d\\n\",x);",
+    "C": "if(a!=0) printf(\"%d\\n\",x); else printf(\"%d\\n\",y);",
+    "D": "if(a==0) printf(\"%d\\n\",x); else printf(\"%d\\n\",y);"
+   },
+   "answer": "D",
+   "analysis": "A、B、C 都是 a 非零时输出 x、a 为零时输出 y；D 正好相反（a 为零时输出 x）。"
+  },
+  {
+   "id": "61",
+   "stem": "有以下程序 main() { int s=0,a=1,n; scanf(\"%d\",&n); do { s+=1; a=a-2; } while(a!=n); printf(\"%d\\n\",s); } 若要使程序的输出值为2，应从键盘给n输入的值是",
+   "options": {
+    "A": "-1",
+    "B": "-3",
+    "C": "-5",
+    "D": "0"
+   },
+   "answer": "B",
+   "analysis": "循环两次：第一次 a=1→-1（s=1），第二次 a=-1→-3（s=2）；条件 a!=n 在 a=-3 时停止，故 n=-3。"
+  },
+  {
+   "id": "62",
+   "stem": "以下程序执行后sum的值是 main() { int i, sum; for(i=1;i<6;i++) sum+=i; printf(\"%d\\n\",sum); }",
+   "options": {
+    "A": "15",
+    "B": "14",
+    "C": "不确定",
+    "D": "0"
+   },
+   "answer": "C",
+   "analysis": "sum 未初始化，累加结果不确定。"
+  },
+  {
+   "id": "63",
+   "stem": "在C语言中，当while(表达式)语句中的表达式的值为( )时，执行循环体。",
+   "options": {
+    "A": "0",
+    "B": "1",
+    "C": "true",
+    "D": "非0"
+   },
+   "answer": "D",
+   "analysis": "while 在表达式为非 0（真）时执行循环体，为 0 时结束。"
+  },
+  {
+   "id": "64",
+   "stem": "以下程序输出的结果是 main() { int x=23; do { printf(\"%d\",x--);} while(!x); }",
+   "options": {
+    "A": "123",
+    "B": "23",
+    "C": "无结果",
+    "D": "死循环"
+   },
+   "answer": "B",
+   "analysis": "先输出 23（x 变 22），!22=0 为假，循环结束；输出 23。"
+  },
+  {
+   "id": "65",
+   "stem": "在C语言中，执行语句：for (j=1; j<=4; ++j)；后，变量j的值是",
+   "options": {
+    "A": "3",
+    "B": "4",
+    "C": "5",
+    "D": "不定"
+   },
+   "answer": "C",
+   "analysis": "j 从 1 循环到 4，退出时执行 ++j 得 5。"
+  },
+  {
+   "id": "66",
+   "stem": "假定a和b为int型变量,则执行以下语句后b的值为 a=1; b=10; do { b-=a; a++; } while (b--<0);",
+   "options": {
+    "A": "9",
+    "B": "-2",
+    "C": "-1",
+    "D": "8"
+   },
+   "answer": "D",
+   "analysis": "第一次循环 b=10-1=9、a=2；判断 b--<0 即 9<0 为假，同时 b 自减为 8；循环结束，b=8。"
+  },
+  {
+   "id": "67",
+   "stem": "若有如下程序段，其中s、a、b、c均已定义为整型变量,且a、c均已赋值（c大于0）s=a; for(b=1;b<=c;b++) s=s+1; 则与上述程序段功能等价的赋值语句是",
+   "options": {
+    "A": "s=a+b;",
+    "B": "s=a+c;",
+    "C": "s=s+c;",
+    "D": "s=b+c;"
+   },
+   "answer": "B",
+   "analysis": "循环执行 c 次，s 从 a 增加 c 次 1，等价于 s=a+c。"
+  },
+  {
+   "id": "68",
+   "stem": "以下用do-while语句构成的循环叙述正确的是",
+   "options": {
+    "A": "不能用其它语句构成的循环来代替。",
+    "B": "只能用break语句退出。",
+    "C": "在while后的表达式为非零时结束循环。",
+    "D": "在while后的表达式为零时结束循环。"
+   },
+   "answer": "D",
+   "analysis": "do-while 先执行循环体再判断，表达式为 0（假）时结束循环，非 0 时继续。"
+  },
+  {
+   "id": "69",
+   "stem": "以下的for循环 for(x=0,y=0;(y!=123)&&(x<4); x++);",
+   "options": {
+    "A": "是无限循环",
+    "B": "循环次数不定",
+    "C": "执行4次",
+    "D": "执行3次"
+   },
+   "answer": "C",
+   "analysis": "x 取 0、1、2、3 时条件成立，共执行 4 次。"
+  },
+  {
+   "id": "70",
+   "stem": "t为int类型，进入下面的循环之前，t的值为0 while( t=1 ) { ... } 则以下叙述中正确的是",
+   "options": {
+    "A": "循环控制表达式的值为0",
+    "B": "循环控制表达式的值为1",
+    "C": "循环控制表达式不合法",
+    "D": "以上说法都不对"
+   },
+   "answer": "B",
+   "analysis": "while(t=1) 中 t=1 是赋值表达式，其值为 1（真），循环不断执行。"
+  },
+  {
+   "id": "71",
+   "stem": "假定int类型变量占用两个字节，其有定义：int x[10]={0,2,4};，则数组x在内存中所占字节数是",
+   "options": {
+    "A": "3",
+    "B": "6",
+    "C": "10",
+    "D": "20"
+   },
+   "answer": "D",
+   "analysis": "数组长度为 10，每个 int 占 2 字节，共 20 字节（与初始化个数无关）。"
+  },
+  {
+   "id": "72",
+   "stem": "有以下程序 main() { int p[7]={11,13,14,15,16,17,18},i=0,k=0; while(i<7&&p[i]%2){k=k+p[i]; i++;} printf(\"%d\\n\",k); } 执行后输出的结果是",
+   "options": {
+    "A": "58",
+    "B": "56",
+    "C": "45",
+    "D": "24"
+   },
+   "answer": "D",
+   "analysis": "p[0]=11、p[1]=13 为奇数累加得 k=24；p[2]=14 为偶数终止循环。"
+  },
+  {
+   "id": "73",
+   "stem": "设有数组定义: char array[]=\"China\"; 则数组array所占的空间为",
+   "options": {
+    "A": "4个字节",
+    "B": "5个字节",
+    "C": "6个字节",
+    "D": "7个字节"
+   },
+   "answer": "C",
+   "analysis": "字符串 \"China\" 5 个字符加字符串结束符 '\\0'，共 6 个字节。"
+  },
+  {
+   "id": "74",
+   "stem": "以下程序的输出结果是 main() { int a[4][4]={{1,3,5},{2,4,6},{3,5,7}}; printf(\"%d%d%d%d\\n\",a[0][3],a[1][2],a[2][1],a[3][0]); }",
+   "options": {
+    "A": "0650",
+    "B": "1470",
+    "C": "5430",
+    "D": "输出值不定"
+   },
+   "answer": "A",
+   "analysis": "未赋初值的元素自动为 0：a[0][3]=0、a[1][2]=6、a[2][1]=5、a[3][0]=0，输出 0650。"
+  },
+  {
+   "id": "75",
+   "stem": "在C语言中，定义数组int a[12]={1,2,3,4,5,6,7,8,9,10,11,12}，则a[3]的值为",
+   "options": {
+    "A": "3",
+    "B": "4",
+    "C": "5",
+    "D": "6"
+   },
+   "answer": "B",
+   "analysis": "数组下标从 0 开始，a[3] 是第 4 个元素，值为 4。"
+  },
+  {
+   "id": "76",
+   "stem": "在C语言中，下面程序输出的结果是 main() { int i; int a[3][3]={1,2,3,4,5,6,7,8,9}; for(i=0;i<2;i++) printf(\"%d \",a[1][i]); }",
+   "options": {
+    "A": "4 5",
+    "B": "3 4",
+    "C": "1 2",
+    "D": "5 6"
+   },
+   "answer": "A",
+   "analysis": "a[1][0]=4、a[1][1]=5，输出 4 5。"
+  },
+  {
+   "id": "77",
+   "stem": "在C语言中，有以下程序 main() { int p[8]={11,12,13,14,15,16,17,18},i=0,j=0; while(i++<7) if(p[i]%2==0) j+=p[i]; printf(\"%d\\n\",j); } 程序运行后的输出结果是",
+   "options": {
+    "A": "42",
+    "B": "45",
+    "C": "56",
+    "D": "60"
+   },
+   "answer": "D",
+   "analysis": "i 先判断后自增，从 p[1] 开始取偶数元素：12+14+16+18=60。"
+  },
+  {
+   "id": "78",
+   "stem": "在C语言中，若有定义：int y=3; int x[7]={1,2,3,4,5,6,7}，则表达式y+=x[5]的值为",
+   "options": {
+    "A": "8",
+    "B": "9",
+    "C": "10",
+    "D": "11"
+   },
+   "answer": "B",
+   "analysis": "x[5]=6，y=3+6=9。"
+  },
+  {
+   "id": "79",
+   "stem": "在C语言中，定义数组int a[2][4]={3,4,5,6,7,8,9,10}，则a[0][3]的值为",
+   "options": {
+    "A": "9",
+    "B": "6",
+    "C": "7",
+    "D": "8"
+   },
+   "answer": "B",
+   "analysis": "按行填充，a[0] 行为 3,4,5,6，a[0][3]=6。"
+  },
+  {
+   "id": "80",
+   "stem": "若有说明：int a[3][4]={{0,1},{2,9},{5,8}}; 则数值为9的元素是",
+   "options": {
+    "A": "a[4]",
+    "B": "a[1][1]",
+    "C": "a[2][2]",
+    "D": "a[1][2]"
+   },
+   "answer": "B",
+   "analysis": "第 2 行 {2,9} 中 9 位于 a[1][1]。"
+  },
+  {
+   "id": "81",
+   "stem": "下面能正确进行字符串赋值操作的语句是",
+   "options": {
+    "A": "char s[5]={\"ABCDEF\"};",
+    "B": "char s[5]={'a','b','c','d','e','f'};",
+    "C": "char *s; s=\"ABCDEF\";",
+    "D": "char s; scanf(\"%s\",s);"
+   },
+   "answer": "C",
+   "analysis": "指针可指向字符串常量（C 合法）；A、B 初始化元素超过数组长度，D 用字符变量存字符串错误。"
+  },
+  {
+   "id": "82",
+   "stem": "在C语言中，合法的数组定义是",
+   "options": {
+    "A": "int a[]=\"string\";",
+    "B": "int a[5]={0,1,2,3,4,5};",
+    "C": "int s=\"string\";",
+    "D": "char a[]={0,1,2,3,4,5};"
+   },
+   "answer": "D",
+   "analysis": "A 用字符串初始化整型数组类型不符；B 初始化项 6 个超过 a[5]；C 用字符串初始化整型变量错误；D 合法（整数可初始化 char 数组）。"
+  },
+  {
+   "id": "83",
+   "stem": "以下能正确定义数组并正确赋初值的语句是",
+   "options": {
+    "A": "int N=5,b[N][N];",
+    "B": "int a[1][2]={{1},{3}};",
+    "C": "int c[2][]={{1,2},{3,4}};",
+    "D": "int d[3][2]={{1,2},{3,4}};"
+   },
+   "answer": "D",
+   "analysis": "A 数组长度必须是常量表达式；B 初始化了 2 行但只声明 1 行；C 第二维不能省略（只有第一维可省）；D 正确。"
+  },
+  {
+   "id": "84",
+   "stem": "若有定义和语句: char s[10]; s=\"abcd\"; printf(\"%s\\n\",s); 则结果是(以下u代表空格)",
+   "options": {
+    "A": "输出abcd",
+    "B": "输出a",
+    "C": "输出abcduuuuu",
+    "D": "编译不通过"
+   },
+   "answer": "D",
+   "analysis": "数组名不能作为整体被字符串赋值，编译报错。"
+  },
+  {
+   "id": "85",
+   "stem": "以下程序段的输出结果是 char s[]=\"\\\\141\\141abc\\t\"; printf(\"%d\\n\",strlen(s));",
+   "options": {
+    "A": "9",
+    "B": "12",
+    "C": "13",
+    "D": "14"
+   },
+   "answer": "A",
+   "analysis": "\\\\ 是 1 个字符（反斜杠），\"141\" 3 个字符，\\141 八进制转义是 1 个字符（'a'），abc 3 个字符，\\t 1 个字符，共 9。"
+  },
+  {
+   "id": "86",
+   "stem": "调用strlen(\"abcd\\0ef\\0g\")的结果为",
+   "options": {
+    "A": "4",
+    "B": "6",
+    "C": "11",
+    "D": "12"
+   },
+   "answer": "A",
+   "analysis": "strlen 遇到 '\\0' 停止，只统计到 \"abcd\" 共 4 个字符。"
+  },
+  {
+   "id": "87",
+   "stem": "在TC中，为了比较两个字符串s1和s2是否相等，应当使用",
+   "options": {
+    "A": "if(s1==s2)",
+    "B": "if(s1=s2)",
+    "C": "if(strcpy(s1,s2))",
+    "D": "if(strcmp(s1,s2)==0)"
+   },
+   "answer": "D",
+   "analysis": "字符串不能直接用 == 比较（比较的是地址），应用 strcmp(s1,s2)==0；strcpy 是复制，= 是赋值。"
+  },
+  {
+   "id": "88",
+   "stem": "在C语言中，用于求|x|的函数是",
+   "options": {
+    "A": "log(x)",
+    "B": "exp(x)",
+    "C": "fabs(x)",
+    "D": "sqrt(x)"
+   },
+   "answer": "C",
+   "analysis": "fabs 求绝对值；log 对数、exp 指数、sqrt 开方。"
+  },
+  {
+   "id": "89",
+   "stem": "在C语言中，用于字符串复制的函数是",
+   "options": {
+    "A": "strcpy",
+    "B": "strlen",
+    "C": "strcmp",
+    "D": "strcat"
+   },
+   "answer": "A",
+   "analysis": "strcpy 复制字符串；strlen 求长度、strcmp 比较、strcat 连接。"
+  },
+  {
+   "id": "90",
+   "stem": "有以下程序 main() { char s[]=\"\\n123\\\\\"; printf(\"%d,%d\\n\",strlen(s),sizeof(s)); } 执行后输出结果是",
+   "options": {
+    "A": "赋初值的字符串有错",
+    "B": "6,7",
+    "C": "5,6",
+    "D": "6,6"
+   },
+   "answer": "C",
+   "analysis": "strlen 为 \\n(1)+123(3)+\\\\(1)=5；sizeof 含 '\\0' 为 6。"
+  },
+  {
+   "id": "91",
+   "stem": "有以下程序 main() { int i; for(i=1;i<=40;i++) { if(i++%5==0) if(++i%8==0) printf(\"%d\",i); } printf(\"\\n\"); } 执行后的输出结果是",
+   "options": {
+    "A": "5",
+    "B": "24",
+    "C": "32",
+    "D": "40"
+   },
+   "answer": "C",
+   "analysis": "循环体内 i 每次多增 2（条件 i++ 与 ++i），逐个检验后仅 i=32 满足两个条件，输出 32。"
+  },
+  {
+   "id": "92",
+   "stem": "以下所列的各函数首部中，正确的是",
+   "options": {
+    "A": "void play(var:Integer,var b:Integer)",
+    "B": "void play(int a,b)",
+    "C": "void play(int a,int b)",
+    "D": "Sub play(a as integer,b as integer)"
+   },
+   "answer": "C",
+   "analysis": "A 是 Pascal 风格、D 是 VB 风格；B 中第二个参数 b 缺类型；C 是合法 C 函数首部。"
+  },
+  {
+   "id": "93",
+   "stem": "以下程序的输出结果是 fun(int x,int y,int z) { z=x*y; } main() { int a=4,b=2,c=6; fun(a,b,c); printf(\"%d\",c); }",
+   "options": {
+    "A": "16",
+    "B": "6",
+    "C": "8",
+    "D": "15"
+   },
+   "answer": "B",
+   "analysis": "形参 z 是实参 c 的副本，函数内修改不影响 main 中的 c，c 仍为 6。"
+  },
+  {
+   "id": "94",
+   "stem": "fun(int x,int y) { int z; z=x+y; return z; } main() { int a=2,b=3,c=6; c=fun(a,b); printf(\"%d\",c); }",
+   "options": {
+    "A": "5",
+    "B": "6",
+    "C": "9",
+    "D": "3"
+   },
+   "answer": "A",
+   "analysis": "fun(2,3) 返回 2+3=5，c=5。"
+  },
+  {
+   "id": "95",
+   "stem": "在C语言中，形参的缺省存储类是",
+   "options": {
+    "A": "auto",
+    "B": "register",
+    "C": "static",
+    "D": "extern"
+   },
+   "answer": "A",
+   "analysis": "形参缺省存储类别为 auto（自动）。"
+  },
+  {
+   "id": "96",
+   "stem": "有以下函数定义：void fun(int n, double x) { ... } 若以下选项中的变量都已正确定义并赋值，则对函数fun的正确调用语句是",
+   "options": {
+    "A": "fun(int y,double m);",
+    "B": "k=fun(10,12.5);",
+    "C": "fun(x,n);",
+    "D": "void fun(n,x);"
+   },
+   "answer": "C",
+   "analysis": "A 是声明不是调用；B 不能给 void 函数返回值赋值；D 调用时不能带 void；C 是合法调用（x 为 int、n 为 double 时参数类型匹配）。"
+  },
+  {
+   "id": "97",
+   "stem": "若函数声明为：void test(int a,int b,char c); 下面的函数调用中属于合法调用的是",
+   "options": {
+    "A": "test(5);",
+    "B": "test(5,8);",
+    "C": "test(6,'#');",
+    "D": "test(0,0,'*');"
+   },
+   "answer": "D",
+   "analysis": "实参个数和类型必须与形参匹配（3 个：int,int,char），只有 D 匹配。"
+  },
+  {
+   "id": "98",
+   "stem": "C语言中规定：在一个源程序中main函数的位置",
+   "options": {
+    "A": "必须在最开始",
+    "B": "必须在系统调用的库函数的后面",
+    "C": "可以任意",
+    "D": "必须在最后"
+   },
+   "answer": "C",
+   "analysis": "main 函数在源程序中的位置可以任意。"
+  },
+  {
+   "id": "99",
+   "stem": "在调用函数时，如果实参是简单变量，它与对应形参之间的数据传递方式是",
+   "options": {
+    "A": "地址传递",
+    "B": "单向值传递",
+    "C": "由实参传给形参，再由形参传回实参",
+    "D": "传递方式由用户指定"
+   },
+   "answer": "B",
+   "analysis": "简单变量作实参按值传递，单向传值，形参改变不影响实参。"
+  },
+  {
+   "id": "100",
+   "stem": "用C语言编写的代码程序",
+   "options": {
+    "A": "可立即执行",
+    "B": "是一个源程序",
+    "C": "经过编译即可执行",
+    "D": "经过编译解释才能执行"
+   },
+   "answer": "B",
+   "analysis": "C 代码是源程序，须经编译、连接后才能生成可执行文件；C 语言是编译型语言非解释型。"
+  },
+  {
+   "id": "101",
+   "stem": "当调用函数时，实参是一个数组名，则向函数传送的是",
+   "options": {
+    "A": "数组的长度",
+    "B": "数组的首地址",
+    "C": "数组每一个元素的地址",
+    "D": "数组每个元素中的值"
+   },
+   "answer": "B",
+   "analysis": "数组名作实参传递的是数组首地址（地址传递）。"
+  },
+  {
+   "id": "102",
+   "stem": "以下说法中正确的是",
+   "options": {
+    "A": "C语言程序总是从自定义函数开始执行",
+    "B": "在C语言程序中，要调用的函数必须在main()函数中定义",
+    "C": "C语言程序总是从main()函数开始执行",
+    "D": "C语言程序中的main()函数必须放在程序的开头部分"
+   },
+   "answer": "C",
+   "analysis": "程序总是从 main 函数开始执行；main 位置可任意，被调函数无需在 main 中定义。"
+  },
+  {
+   "id": "103",
+   "stem": "C语言程序是由（）组成的。",
+   "options": {
+    "A": "主程序和子程序",
+    "B": "过程",
+    "C": "函数",
+    "D": "子程序"
+   },
+   "answer": "C",
+   "analysis": "C 语言程序的基本组成单位是函数。"
+  },
+  {
+   "id": "104",
+   "stem": "下面程序的执行结果是 #define SUM(X) X*X+1 #include<stdio.h> main() { int a=3; int i=2,j=1; a+=SUM(i+j)/SUM(i+j); printf(\"%d\\n\",a); }",
+   "options": {
+    "A": "4",
+    "B": "13",
+    "C": "14",
+    "D": "15"
+   },
+   "answer": "A",
+   "analysis": "宏无括号替换 SUM(i+j)=i+j*i+j+1=2+1*2+1+1=6，6/6=1，a=3+1=4。"
+  },
+  {
+   "id": "105",
+   "stem": "在C语言中，下面程序的执行结果是 #define SUM(X) X*X #include<stdio.h> main() { int a=2; int i=1,j=1; a+=SUM(i+j)/SUM(i+j); printf(\"%d\\n\",a); }",
+   "options": {
+    "A": "6",
+    "B": "3",
+    "C": "1",
+    "D": "9"
+   },
+   "answer": "B",
+   "analysis": "SUM(i+j)=i+j*i+j=1+1*1+1=3，3/3=1，a=2+1=3。"
+  },
+  {
+   "id": "106",
+   "stem": "以下叙述中正确的是",
+   "options": {
+    "A": "预处理命令行必须位于源文件的开头",
+    "B": "在源文件的一行上可以有多条预处理命令",
+    "C": "宏名必须用大写字母表示",
+    "D": "宏替换不占用程序的运行时间"
+   },
+   "answer": "D",
+   "analysis": "宏替换在编译预处理阶段完成，不占运行时间；预处理命令可出现在文件中（不一定开头）、一行一条、宏名大小写均可。"
+  },
+  {
+   "id": "107",
+   "stem": "若运行时给变量x输入12,则以下程序的运行结果是 main() { int x,y; scanf(\"%d\",&x); y=x>12?x+10:x-12; printf(\"%d\\n\",y); }",
+   "options": {
+    "A": "0",
+    "B": "22",
+    "C": "12",
+    "D": "10"
+   },
+   "answer": "A",
+   "analysis": "12>12 为假，y=12-12=0。"
+  },
+  {
+   "id": "108",
+   "stem": "设有定义：int a=2,b=3,c=4;则以下选项中值为0的表达式是",
+   "options": {
+    "A": "(!a==1)&&(!b==0)",
+    "B": "a--",
+    "C": "a&&b",
+    "D": "a||(b+b)&&(c=a)"
+   },
+   "answer": "A",
+   "analysis": "!a=0，0==1 为假，整体为 0；B 值 2、C 值 1、D 中 a||... 为 1。"
+  },
+  {
+   "id": "109",
+   "stem": "下面程序的运行结果是 main() { float x=12.34567,y=345.2354; printf(\"x=%5.3f,y=%5.3f\\n\",x,y); }",
+   "options": {
+    "A": "12.346,345.235",
+    "B": "x=12.346,y=345.235",
+    "C": "12.345670,345.235000",
+    "D": "x=12.34567,y=345.2354"
+   },
+   "answer": "B",
+   "analysis": "%5.3f 保留 3 位小数并四舍五入，且格式串含 \"x=\" 前缀，输出 x=12.346,y=345.235。"
+  },
+  {
+   "id": "110",
+   "stem": "已知i,j,k为int型变量，若从键盘输入：1，2，3<回车>，使i,j,k的值分别为1，2，3，以下选项正确的输入语句是",
+   "options": {
+    "A": "scanf(\"%d%d%d\",&i,&j,&k);",
+    "B": "scanf(\"%d,%d,%d\",&i,&j,&k);",
+    "C": "scanf(\"%2d%2d%2d\",&i,&j,&k);",
+    "D": "scanf(\"i=%d,j=%d,k=%d\",&i,&j,&k);"
+   },
+   "answer": "B",
+   "analysis": "输入带逗号，格式串须含逗号，选 %d,%d,%d。"
+  },
+  {
+   "id": "111",
+   "stem": "以下不能对二维数组a进行正确初始化的语句是",
+   "options": {
+    "A": "int a[2][3]={0};",
+    "B": "int a[][3]={{1,2,3},{4,5,6}};",
+    "C": "int a[2][4]={{1,2,3},{4,5},{6}};",
+    "D": "int a[][3]={{1,0,1},{0},{1,1}};"
+   },
+   "answer": "C",
+   "analysis": "C 初始化了 3 行，超出声明的 2 行；A、B、D 均合法（B 首维可省略，D 按行补齐 0）。"
+  },
+  {
+   "id": "112",
+   "stem": "以下能正确地定义整型变量a,b和c并为其赋初值5的语句是",
+   "options": {
+    "A": "int a=5,b=5,c=5;",
+    "B": "int a,b,c=5;",
+    "C": "int a=b=c=5;",
+    "D": "a=b=c=5;"
+   },
+   "answer": "A",
+   "analysis": "A 三个变量都赋 5；B 只有 c 赋 5；C 中 b、c 未声明；D 缺声明。"
+  },
+  {
+   "id": "113",
+   "stem": "以下循环体的执行次数是 main() { int i,j; for(i=0,j=1;i<=j+1;i+=2,j--) printf(\"%d \\n\",i); }",
+   "options": {
+    "A": "3",
+    "B": "2",
+    "C": "1",
+    "D": "0"
+   },
+   "answer": "C",
+   "analysis": "第一次执行后 i=2、j=0，条件 2<=0+1 为假，循环体只执行 1 次。"
+  },
+  {
+   "id": "114",
+   "stem": "阅读以下程序,当输入数据的形式为:25,13,10<回车>正确的输出结果为 main() {int x,y,z; scanf(\"%d%d%d\",&x,&y,&z); printf(\"x+y+z=%d\\n\",x+y+z); }",
+   "options": {
+    "A": "x+y+z=48",
+    "B": "x+y+z=35",
+    "C": "x+z=35",
+    "D": "不确定值"
+   },
+   "answer": "D",
+   "analysis": "格式 \"%d%d%d\" 无逗号，读到 25 后遇逗号停止，y、z 未赋值，结果不确定。"
+  },
+  {
+   "id": "115",
+   "stem": "在printf函数中用来输出十六进制整数的格式字符是",
+   "options": {
+    "A": "d格式符",
+    "B": "x格式符",
+    "C": "u格式符",
+    "D": "o格式符"
+   },
+   "answer": "B",
+   "analysis": "%x 输出十六进制（%o 八进制、%u 无符号十进制、%d 十进制）。"
+  },
+  {
+   "id": "116",
+   "stem": "在C语言中，以下一组运算符中,优先级最低的运算符是",
+   "options": {
+    "A": "<=",
+    "B": "=",
+    "C": "%",
+    "D": "&&"
+   },
+   "answer": "B",
+   "analysis": "赋值运算符 = 优先级最低，低于关系（<=）、算术（%）、逻辑与（&&）。"
+  },
+  {
+   "id": "117",
+   "stem": "在C语言中，已知char c; 则下列语句中正确的是",
+   "options": {
+    "A": "c='a'",
+    "B": "c=\"a\"",
+    "C": "c=\"97\"",
+    "D": "'97'"
+   },
+   "answer": "A",
+   "analysis": "字符变量只能赋单个字符常量；B、C 是字符串，D 是多字符常量且不是语句。"
+  },
+  {
+   "id": "118",
+   "stem": "假定x和y为double型，则表达式x=2,y=x+3/2的值是",
+   "options": {
+    "A": "3.5",
+    "B": "3",
+    "C": "2",
+    "D": "3.0"
+   },
+   "answer": "D",
+   "analysis": "3/2=1（整数除法），y=2.0+1=3.0。"
+  }
+ ],
+ "program": [
+  {
+   "id": "G1",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "下面程序求[2,60]之间的所有偶数的立方和。请修改程序中的错误，使其得出正确结果。",
+   "code": "#include <stdio.h>\n#include <math.h>\nmain()\n{\n       long sum;\n       int i;\n       sum=0;\n       for (i=2;i<=60;i++)\n       {\n        if (fmod(i,2)==0)\n            sum+=i*3;\n       }\n       printf(\"%ld\\n\",sum);\n}",
+   "answerRaw": "① int i → long i\n      ② sum+=i*3 → sum+=i*i*i",
+   "analysis": "① 立方和用 long 存储更稳妥，循环变量相应改 long；② 题目要求\"立方和\"，sum+=i*3 是乘 3 不是立方，应改为 sum+=i*i*i。",
+   "ref": "1729800"
+  },
+  {
+   "id": "G2",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "下面程序求[5,75]之间的所有奇数的立方和。请修改程序中的错误，使其得出正确结果。",
+   "code": "#include <conio.h>\n#include <stdio.h>\n#include <math.h>\nmain()\n{\n       long sum;\n       int i;\n       sum=0;\n       for (i=5;i<75;i++)\n       {\n        if (fmod(i,2)!=0)\n            sum+=i*i*i;\n       }\n       printf(\"%ld\\n\",sum);\n}",
+   "answerRaw": "① int i → long i\n      ② for(i=5;i<75;i++) → for(i=5;i<=75;i++)",
+   "analysis": "① 结果 4168827 用 long 存储；② i<75 漏掉了 75 本身，应改为 i<=75，否则少算 75³。",
+   "ref": "4168827"
+  },
+  {
+   "id": "G3",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "函数fun的功能是计算并输出k以内最大的10个能被13或17整除的自然数之和。改正错误，当输入500时给出运行结果。",
+   "code": "#include <stdio.h>\nint fun(int k)\n{ int m=0, mc=0, j;\n  while((k>=2) || mc<10)\n   { if ((k%13==0) && (k%17==0))\n     { m=m+k; mc++; }\n     k--;\n   }\n   return m;\n}\nmain()\n{ int k;\n  printf(\"\\n 请输入整数:\");\n  scanf(\"%d\", &k);\n  printf(\" %d\\n\",fun(k));\n}",
+   "answerRaw": "① while((k>=2)||mc<10) → while((k>=2)&&mc<10)\n      ② if((k%13==0)&&(k%17==0)) → if((k%13==0)||(k%17==0))",
+   "analysis": "① 循环终止条件应为\"k>=2 且 未满10个\"，用 || 会一直循环到 mc>=10 也不停；② 题意是\"能被13或17整除\"（任一即可），用 && 变成必须同时被13和17整除，条件过严。",
+   "ref": "4622"
+  },
+  {
+   "id": "G4",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "下面程序求[1,550]之间同时满足除3余2和除5余3条件的数之和。请修改错误。",
+   "code": "#include <stdio.h>\n#include <math.h>\nmain()\n{\n       int sum;\n       int i;\n       sum=0;\n       for (i=1;i<=550;i++)\n       {\n        if (fmod(i,3)==2 && fmod(i,5)==3)\n            sum+=1;\n       }\n       printf(\"%ld\\n\",sum);\n}",
+   "answerRaw": "① int sum → long sum\n      ② sum+=1 → sum+=i",
+   "analysis": "① 和的类型用 long；② 题目求\"数之和\"，sum+=1 只统计个数，应改为 sum+=i 累加满足条件的数本身。",
+   "ref": "10286"
+  },
+  {
+   "id": "G5",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "24有8个因子且24能被8整除。下面程序求[10,150]之间所有能被其因子的个数整除的整数中最大的数。",
+   "code": "#include <conio.h>\n#include <stdio.h>\n#include <math.h>\nmain()\n{\n  int a,b,c,n,big;\n  b=0;\n  for (a=10; a<=150; a++)\n   {    b=0;\n      for (c=2;c<=a;c++)\n       if (a%c ==0)\n         b++\n       if (a%b==0)\n        {\n          big=a;\n        }\n    }\n  printf(\"%d\\n \",big);\n}",
+   "answerRaw": "① for(c=2;c<=a;c++) → for(c=1;c<=a;c++)\n      ② b++ → b++;",
+   "analysis": "① 因子个数包括 1 和该数本身（如24有8个因子含1和24），c 应从 1 开始；② b++ 缺分号是语法错误。",
+   "ref": "136"
+  },
+  {
+   "id": "G6",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "求 s=1+1/(1+2)+1/(1+2+3)+...+1/(1+2+3+...+n)，改正错误，当n=90时给出结果（保留6位小数）。",
+   "code": "#include <stdio.h>\n#include <math.h>\nint fun(int n)\n{ int i;\n  float s=0.0, t=1.0;\n  for(i=2; i<=n;i++)\n   { t=t+i;\n     s=s+1/t;\n   }\n  return s;\n}\nmain()\n{ printf(\"\\n %f\", fun(90)); }",
+   "answerRaw": "① float s=0.0 → float s=1.0\n      ② int fun → float fun",
+   "analysis": "① 第一项 1/1=1 是 s 的初始值，s=0.0 会丢掉首项；② 函数返回浮点数，int 返回值会被截断为整数，应把函数类型改为 float。",
+   "ref": "1.978022"
+  },
+  {
+   "id": "G7",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "求1000以内最大的完全数。\"完全数\"指一个数刚好与它所有的真因子（不包括本身）之和相等（如6=1+2+3）。",
+   "code": "#include <stdio.h>\n#include <math.h>\nmain()\n{\n       int n,m,s,k,big;\n       for (n=3;n<=1000;n++)\n       {\n         s=1;\n         k=n/2+1;\n         for (m=1;m<k;m++)\n              if (n%m==0)\n                      s+=1;\n              if (s==n)\n              {\n                     big=n;\n              }\n       }\n       printf(\"%d\",big);\n}",
+   "answerRaw": "① s+=1 → s+=m",
+   "analysis": "s 应累加的是因子 m 本身（如 6=1+2+3），s+=1 只计数，恒等于因子个数，不可能等于 n。",
+   "ref": "496"
+  },
+  {
+   "id": "G8",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "求 s=1+1/(1+2)+1/(1+2+3)+...+1/(1+2+3+...+n)，改正错误，当n=70时给出结果（保留6位小数）。",
+   "code": "#include <stdio.h>\n#include <math.h>\nfloat fun(int n)\n{ int i;\n  float s=1.0, t=1.0;\n  for(i=2; i<n;i++)\n   { t=t+i;\n     s=s+1/t;\n   }\n  return ;\n}\nmain()\n{ printf(\"\\n %f\", fun(70)); }",
+   "answerRaw": "① for(i=2;i<n;i++) → for(i=2;i<=n;i++)\n      ② return ; → return s;",
+   "analysis": "① i<n 漏掉最后一项 i=n，应改为 i<=n；② return; 没有返回值，应 return s 返回计算结果。",
+   "ref": "1.971831"
+  },
+  {
+   "id": "G9",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "若某个整数N的所有因子之和等于N的倍数，则称N为多因子完备数（如28：1+2+4+7+14+28=56=28*2）。求[10,800]间有多少个多因子完备数。",
+   "code": "#include <stdio.h>\n#include <math.h>\nmain()\n{\n int a,b,c,n,count=0;\n  for (a=10; a<=800; a++)\n   {\n    b=0;\n     for (c=2;c<=a;c++)\n       if (a%c ==0)\n         b=b+c;\n       if (b%a==0)\n        {\n         count=count+b;\n        }\n    }\n  printf(\"%d\",count);\n}",
+   "answerRaw": "① for(c=2;c<=a;c++) → for(c=1;c<=a;c++)\n      ② count=count+b → count++",
+   "analysis": "① 因子和需包含 1（如28的因子从1起），c 应从 1 开始；② 题目求\"个数\"，count 应自增 1，而不是累加因子和 b。",
+   "ref": "4"
+  },
+  {
+   "id": "G10",
+   "type": "fix",
+   "typeLabel": "程序改错题",
+   "stem": "已知 abc+cba=1333（a,b,c均为一位数），编程求满足条件的a,b,c组合共有多少种。",
+   "code": "#include<stdio.h>\nvoid main()\n{     int num,a,b,c,count=0;\n      while(num=101;num<1000;num++)\n      {   a=num/100;\n          b=num%100/10;\n          c=num%10;\n          if(num+c*100+b*10+a=1333)\n              count++;\n      }\n      printf(\"%d\\n\",count);\n}",
+   "answerRaw": "① while(num=101;num<1000;num++) → for(num=101;num<1000;num++)\n      ② if(num+c*100+b*10+a=1333) → if(num+c*100+b*10+a==1333)",
+   "analysis": "① while 后跟分号分隔的表达式是语法错误，遍历应使用 for；② = 是赋值，比较应使用 ==。",
+   "ref": "6"
+  },
+  {
+   "id": "T1",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求10000以内的所有完全数之和。\"完全数\"指一个数刚好与它所有真因子（不包括本身）之和相等（如6=1+2+3）。",
+   "code": "main()\n{\n       int sum,n,m,s,k;\n       sum=0;\n       for (n=3;n<=10000;n++)\n       { s=1;\n         k=n/2+1;\n         for (m=2;m<k;m++)\n              if (n%m==0)\n              ________;\n              if (s==n)\n              {\n              ____________\n              }\n       }\n       printf(\"%d\",sum);\n}",
+   "answerRaw": "① s+=m;\n      ② sum+=n;",
+   "analysis": "① m 是 n 的真因子，累加因子和 s+=m（s 初值已含 1）；② 当 s==n 时 n 是完全数，把 n 累加到总和 sum+=n（而非只记 big），才能输出 8658。",
+   "ref": "8658"
+  },
+  {
+   "id": "T2",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求[500,1000]之间同时满足除以7余5、除以5余3、除以3余1的整数之和。",
+   "code": "main()\n{  int i;\n  ________________\n  sum=0;\n  for (i=500;i<=1000;i++)\n  {\n      if ((i%7==5) && (i%5==3) && (i%3==1))\n         {\n          _____________\n         }\n    }\n  printf(\"%d\", sum);\n}",
+   "answerRaw": "① int sum;\n      ② sum+=i;",
+   "analysis": "① 使用 sum 前需声明 int sum;；② 满足三个余数条件时累加该数 sum+=i。",
+   "ref": "3665"
+  },
+  {
+   "id": "T3",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求 F(30)（Fibonacci 数列 F(1)=F(2)=1, F(n)=F(n-1)+F(n-2)）。",
+   "code": "main()\n{  double f1,f2;\n  int i;\n  ____________\n  f2=1;\n  for (____________)\n  {\n   f1=f1+f2;\n   f2=f2+f1;\n  }\n  printf(\"%12.0lf\",f2);\n}",
+   "answerRaw": "① f1=1;\n      ② i=1;i<=14;i++",
+   "analysis": "① 初始化 f1=1；② 循环体每轮把数列推进两项（f1=f1+f2 得下一项，f2=f2+f1 再推一项），故 14 轮可到 F(30)。",
+   "ref": "832040"
+  },
+  {
+   "id": "T4",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "设 S=1+(1+3)+(1+3+5)+(1+3+5+7)+...，求S>20000的最小值S。",
+   "code": "main()\n{\n int k,s=0,sum=0;\n   for(_____________)\n   {\n     s=s+2*k-1;\n     _____________;\n   if(sum>20000) break;\n   }\n printf(\"%d\\n\",sum);\n}",
+   "answerRaw": "① k=1;;k++\n      ② sum+=s;",
+   "analysis": "① 用 for(k=1;;k++) 无限循环配合内部 break；② s 是当前括号内的奇数和（1+3+...+(2k-1)=k²），把各组 s 累加到 sum+=s。",
+   "ref": "20540"
+  },
+  {
+   "id": "T5",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "已知正整数 a>b>c，且 a+b+c<100，求满足 1/(a*a)+1/(b*b)=1/(c*c) 的共有多少组。",
+   "code": "main()\n{int a,b,c,cout=0;\n for(c=1;c<100;c++)\n   for(b=c+1;b<100;b++)\n     for(_____________)\n       if(_____________)\n     cout++;\n printf(\"%d\\n\",cout);\n}",
+   "answerRaw": "① a=b+1;a<100;a++\n      ② 1.0/(a*a)+1.0/(b*b)==1.0/(c*c)&&a+b+c<100",
+   "analysis": "① 由 a>b>c，a 从 b+1 开始遍历；② 必须用浮点除法（1.0/...）比较倒数平方和，整数除法 1/(a*a) 恒为 0；并满足 a+b+c<100。",
+   "ref": "2"
+  },
+  {
+   "id": "T6",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "有一分数序列 2/1, 3/2, 5/3, 8/5, 13/8, 21/13, ...，求前30项之和（四舍五入精确到小数点后第二位）。",
+   "code": "#include \"stdio.h\"\nmain()\n{int n;\n float t,a=2,b=1,s=0;\n for(n=1;n<=30;n++)\n {_____________;\n  _____________; a=a+b; b=t;\n }\n printf(\"%.2f\\n\",s);\n}",
+   "answerRaw": "① s=s+a/b;\n      ② t=a;",
+   "analysis": "① 先累加当前项 a/b；② 用 t 暂存 a（t=a），再递推 a=a+b、b=t，实现分子分母交替更新。",
+   "ref": "48.84"
+  },
+  {
+   "id": "T7",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求这样的三位正整数：各位数字的和为8，且该数是偶数，求有多少个。",
+   "code": "#include \"stdio.h\"\nmain()\n{\n int n,a,b,c,i=0;\n for(n=100;n<=999;n++)\n {\n    a=n/100;\n    b=_____________;\n    c=n%10;\n    if(_____________)\n          i=i+1;\n }\n printf(\"%d\\n\",i);\n}",
+   "answerRaw": "① n%100/10;\n      ② a+b+c==8 && n%2==0",
+   "analysis": "① 取十位数字 b=n%100/10；② 条件为各位数字和等于 8 且为偶数（个位是偶数即 n 为偶数）。",
+   "ref": "20"
+  },
+  {
+   "id": "T8",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求这样的四位正整数：各位数字的和为10，且该数是奇数，求有多少个。",
+   "code": "#include \"stdio.h\"\nmain()\n{\n int n,a,b,c,d,i=0;\n for(n=1000;n<=9999;n++)\n {\n  a=n/1000;\n  b=_____________;\n  c=(n-a*1000-b*100)/10;\n  d=n%10;\n  if(_____________)\n      i=i+1;\n }\n printf(\"%d\\n\",i);\n}",
+   "answerRaw": "① n%1000/100\n      ② a+b+c+d==10 && n%2==1",
+   "analysis": "① 取百位数字 b=n%1000/100；② 各位数字和等于 10（含个位 d）且为奇数（个位奇数即 n 为奇数）。",
+   "ref": "95"
+  },
+  {
+   "id": "T9",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求出各位数字的立方和为1000的五位数中按从小到大排列的第10个数。",
+   "code": "#include \"stdio.h\"\nmain(){\n  int a,b,c,d,e,i=0;\n  long int n;\n  for(n=10000;n<=99999;n++)\n {    a=n/10000;\n    b=(n-a*10000)/1000;\n    c=(n-a*10000-b*1000)/100;\n    d=_______________;\n    e=n%10;\n    if(a*a*a+b*b*b+c*c*c+d*d*d+e*e*e==1000)\n      i=i+1;\n    if(i==10)\n   {\n      printf(\"%d\\n\",n);\n      _______________;\n    }\n  }\n}",
+   "answerRaw": "① n%100/10\n      ② break",
+   "analysis": "① 取十位数字 d=n%100/10；② 找到第 10 个满足条件的数后输出并 break 退出循环。",
+   "ref": "19336"
+  },
+  {
+   "id": "T10",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "设 S=2^2/(1*3)+4^2/(3*5)+...+(2k)^2/((2k-1)*(2k+1))，求 k=50 时 S 的值（四舍五入精确到小数点后第三位）。",
+   "code": "#include \"stdio.h\"\nmain()\n{\n  _____________;\n  for(k=1;k<=50;k++)\n    _____________;\n  printf(\"%.3f\\n\",s);\n}",
+   "answerRaw": "① float s=0,k;\n      ② s=s+1.0*(2*k)*(2*k)/((2*k-1)*(2*k+1));",
+   "analysis": "① 声明浮点变量 s 与整型 k；② 累加通项 (2k)²/((2k-1)(2k+1))，用 1.0* 保证浮点除法（否则整数除法为 0）。",
+   "ref": "50.495"
+  },
+  {
+   "id": "T11",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "当 m=10 时计算 t=1-1/(2*2)-1/(3*3)-...-1/(m*m)（四舍五入精确到小数点后两位）。",
+   "code": "#include <stdio.h>\nmain()\n{\n float m,t,s=1;\n for(m=2;m<=10;m++)\n   _____________;\n printf(_____________);\n}",
+   "answerRaw": "① s=s-1.0/(m*m);\n      ② \"%.2f\",s",
+   "analysis": "① 从 2 到 m 逐项累减 1/(m*m)，用 1.0/ 保证浮点除法；② printf 按 %.2f 输出 s。",
+   "ref": "0.45"
+  },
+  {
+   "id": "T12",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "已知 x(1)=1, x(n)=1/(1+x(n-1))，求 x(1)+x(2)+...+x(8)（四舍五入精确到小数点后四位）。",
+   "code": "#include \"stdio.h\"\nmain()\n{  int n;\n  float x=1,s=1;\n  for(n=2;n<=8;n++)\n  { _____________;\n    s=s+x;\n  }\n  _____________;\n}",
+   "answerRaw": "① x=1/(1+x);\n      ② printf(\"%.4f\",s);",
+   "analysis": "① 按递推式更新 x=1/(1+x)；② 输出累加和 s，保留 4 位小数。",
+   "ref": "5.2437"
+  },
+  {
+   "id": "T13",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求四位偶数中，每位数字之积（且不为0）是60的倍数的数的累加和。",
+   "code": "#include \"stdio.h\"\nmain()\n{int ge,shi,bai,qian;\n long int result=0;\n for(_____________)\n for(shi=1;shi<=9;shi++)\n   for(bai=1;bai<=9;bai++)\n       for(qian=1;qian<=9;qian++)\n   if((ge*shi*bai*qian%60)==0)\n      _____________;\n printf(\"%ld\\n\",result);\n}",
+   "answerRaw": "① ge=2;ge<=8;ge+=2\n      ② result=result+qian*1000+bai*100+shi*10+ge;",
+   "analysis": "① 个位 ge 取偶数 2、4、6、8（保证四位偶数字位均不为 0）；② 满足积为 60 的倍数时，把该四位数累加进 result。",
+   "ref": "2832006"
+  },
+  {
+   "id": "T14",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求符合下列条件的四位数（千位数字+十位数字=百位数字×个位数字，如3136：3+3=1*6）中最大的一个数。",
+   "code": "#include<stdio.h>\nmain()\n{  int i,a,b,c,d,n;\n   for( i=9999; i>=1000; i--)\n   {\n      a=i/1000;\n      b=(i-a*1000)/100;\n      c=(i-a*1000-b*100)/10;\n      d=i%10;\n      if    _______________\n {   printf(\"%d\",i);\n     _________________\n }\n   }\n}",
+   "answerRaw": "① (a+c==b*d)\n      ② break;",
+   "analysis": "① 条件为千位+十位=百位×个位，即 a+c==b*d；② 从大到小遍历，找到第一个满足的数即最大，输出后 break。",
+   "ref": "9992"
+  },
+  {
+   "id": "T15",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求所有的千位数字与十位数字之和等于百位数字与个位数字之积的四位正整数的个数（如3136）。",
+   "code": "#include \"stdio.h\"\nmain(){\n  int a,b,c,d,n;\n  int i=0;\n  for(_______________){\n    a=n/1000;\n    b=(n-a*1000)/100;\n    c=(n-a*1000-b*100)/10;\n    d=n%10;\n    if(_______________)\n      i++;\n  }\n  printf(\"%d\\n\",i);\n}",
+   "answerRaw": "① n=1000;n<=9999;n++\n      ② a+c==b*d",
+   "analysis": "① 遍历所有四位数；② 条件 a+c==b*d，满足则计数 i++。",
+   "ref": "207"
+  },
+  {
+   "id": "T16",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "一个整数加上100后是一个完全平方数，再加上168又是一个完全平方数，求[1,2000]中满足条件的数的个数。",
+   "code": "main()\n{ int x,y,z,i,count=0;\n for (i=1;i<=2000;i++)\n   {\n     _____________;\n     y=sqrt(i+268);\n   if(_____________)\n   count++;\n }\n  printf(\"%d\\n\",count);\n}",
+   "answerRaw": "① x=sqrt(i+100);\n      ② x*x==i+100 && y*y==i+268",
+   "analysis": "① 先取 x=sqrt(i+100)；② 判断 i+100 与 i+268 是否完全平方数（开方后平方等于原数），二者都满足才计数。",
+   "ref": "3"
+  },
+  {
+   "id": "T17",
+   "type": "blank",
+   "typeLabel": "程序填空题",
+   "stem": "求在正整数[1,500]中，能满足用3除余2、或用5除余3、或用7除余2的正整数的个数。",
+   "code": "#include \"stdio.h\"\nmain()\n{ int i,n=0;\n  for(i=1;i<=500;i++)\n  if( _____________)\n    _____________;\n  printf(\"%d\\n\",n);\n}",
+   "answerRaw": "① i%3==2||i%5==3||i%7==2\n      ② n++;",
+   "analysis": "① 三个余数条件是\"或\"关系（满足任一即可）；② 满足条件计数 n++。",
+   "ref": "273"
+  }
+ ]
+};
+})(typeof window !== "undefined" ? window : globalThis);
+if (typeof module !== "undefined" && module.exports) module.exports = (typeof window !== "undefined" ? window : globalThis).CK_DATA;
+
+/*
+ * C_KING 判分核心（纯逻辑，无 DOM 依赖）
+ * 浏览器与 Node（冒烟测试）通用：core.js 挂到全局 CK_CORE，同时支持 module.exports。
+ *
+ * 判分约定（用户定稿 v1.1）：
+ *  - 四档判定：strict 完全一致 → 对；lenient 仅"多余空格/末尾分号"差异 → 对+提醒；
+ *    fullwidth 含中文输入法全角符号 → 错+全角提醒；wrong → 错+参考答案
+ *  - 大小写敏感（C 语言语义）
+ *  - 改错题：选错行 / 选对行但没改对 → 错，不得分
+ */
+(function (g) {
+  "use strict";
+  var C = {};
+
+  /* ---------------- 归一化 ---------------- */
+
+  // 去除所有空白（用于"行是否包含原片段"的匹配）
+  C.stripWS = function (s) {
+    return String(s == null ? "" : s).replace(/\s+/g, "");
+  };
+
+  // 压缩空白为单个空格并去首尾
+  C.collapseWS = function (s) {
+    return String(s == null ? "" : s).replace(/\s+/g, " ").trim();
+  };
+
+  // 去掉末尾分号（含其前后空白）
+  C.stripTrailingSemi = function (s) {
+    return String(s == null ? "" : s).replace(/\s*;\s*$/, "");
+  };
+
+  // 最终归一化：去末尾分号 → 压缩空白
+  C.norm = function (s) {
+    return C.collapseWS(C.stripTrailingSemi(s));
+  };
+
+  // 全角 → 半角（中文输入法符号；仅用于 fullwidth 档的检测，不参与 lenient 宽容）
+  C.full2half = function (s) {
+    return String(s == null ? "" : s).replace(/[！-～　]/g, function (ch) {
+      if (ch === "　") return " ";
+      return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+    });
+  };
+
+  // 找出输入中的全角符号，返回 [{full, half}]（去重）
+  C.findFullwidth = function (s) {
+    var out = [];
+    String(s == null ? "" : s).split("").forEach(function (ch) {
+      var half = null;
+      if (ch === "　") half = " ";
+      else {
+        var c = ch.charCodeAt(0);
+        if (c >= 0xFF01 && c <= 0xFF5E) half = String.fromCharCode(c - 0xFEE0);
+      }
+      if (half !== null && !out.some(function (x) { return x.full === ch; })) {
+        out.push({ full: ch, half: half });
+      }
+    });
+    return out;
+  };
+
+  /* ---------------- 四档判定 ---------------- */
+  // 返回 'strict' | 'lenient'（空格/分号差异，判对+提醒）| 'fullwidth'（含全角符号，判错+提醒）| 'wrong'
+  C.compare3 = function (user, answer) {
+    var u = String(user == null ? "" : user);
+    var a = String(answer == null ? "" : answer);
+    if (u.trim() === a.trim()) return "strict";
+    if (C.norm(u) === C.norm(a)) return "lenient";
+    if (C.norm(C.full2half(u)) === C.norm(C.full2half(a))) return "fullwidth";
+    return "wrong";
+  };
+
+  // 判断用户输入是否与"原代码"相同（即没真正改；去空白但保留分号）
+  C.sameCode = function (user, orig) {
+    return C.stripWS(user) === C.stripWS(orig);
+  };
+
+  /* ---------------- 答案解析 ---------------- */
+
+  var MARK_RE = /^[①②③④⑤⑥⑦⑧⑨⑩]/;
+
+  // 改错题答案 "① int i → long i\n② sum+=i*3 → sum+=i*i*i"
+  // → [{orig, fix}, ...]（注意答案行可能有行首缩进，先 trim 再剥 ①② 标记）
+  C.parseFixAnswer = function (raw) {
+    var pairs = [];
+    String(raw || "").split(/\r?\n/).forEach(function (line) {
+      var l = line.trim().replace(MARK_RE, "").trim();
+      if (!l) return;
+      var arrow = l.indexOf("→");
+      if (arrow === -1) {
+        pairs.push({ orig: l, fix: l }); // 无箭头：原样视为答案
+        return;
+      }
+      var orig = l.slice(0, arrow).trim();
+      var fix = l.slice(arrow + 1).trim();
+      if (orig && fix) pairs.push({ orig: orig, fix: fix });
+    });
+    return pairs;
+  };
+
+  // 填空题答案 "① s+=m;\n② sum+=n;" → ["s+=m;", "sum+=n;"]
+  C.parseBlankAnswer = function (raw) {
+    var out = [];
+    String(raw || "").split(/\r?\n/).forEach(function (line) {
+      var l = line.trim().replace(MARK_RE, "").trim();
+      if (l) out.push(l);
+    });
+    return out;
+  };
+
+  // 找程序代码中的下划线空（_{2,}），返回 [{line, start, end, len}]（line 为 0 基行号）
+  C.findBlanks = function (code) {
+    var blanks = [];
+    String(code || "").split(/\r?\n/).forEach(function (line, idx) {
+      var re = /_{2,}/g;
+      var m;
+      while ((m = re.exec(line)) !== null) {
+        blanks.push({ line: idx, start: m.index, end: m.index + m[0].length, len: m[0].length });
+      }
+    });
+    return blanks;
+  };
+
+  /* ---------------- C 语法着色（极简，返回已转义 HTML） ---------------- */
+  var KW = "auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while";
+  var KW_SET = {};
+  KW.split(" ").forEach(function (k) { KW_SET[k] = 1; });
+
+  C.highlightC = function (code) {
+    var out = "";
+    var i = 0;
+    var n = code.length;
+    function esc1(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    while (i < n) {
+      var c = code[i];
+      var rest = code.slice(i);
+      // 行注释 //
+      if (c === "/" && code[i + 1] === "/") {
+        var j = code.indexOf("\n", i);
+        if (j === -1) j = n;
+        out += "<span class='c'>" + esc1(code.slice(i, j)) + "</span>";
+        i = j;
+        continue;
+      }
+      // 块注释 /* */
+      if (c === "/" && code[i + 1] === "*") {
+        var j2 = code.indexOf("*/", i + 2);
+        if (j2 === -1) j2 = n - 2;
+        out += "<span class='c'>" + esc1(code.slice(i, j2 + 2)) + "</span>";
+        i = j2 + 2;
+        continue;
+      }
+      // 字符串 / 字符常量
+      if (c === '"' || c === "'") {
+        var q = c;
+        var j3 = i + 1;
+        var inner = c;
+        while (j3 < n) {
+          var cc = code[j3];
+          inner += cc;
+          j3++;
+          if (cc === "\\") {
+            if (j3 < n) { inner += code[j3]; j3++; }
+            continue;
+          }
+          if (cc === q) break;
+        }
+        out += "<span class='s'>" + esc1(inner) + "</span>";
+        i = j3;
+        continue;
+      }
+      // 预处理指令
+      if (c === "#") {
+        var j4 = code.indexOf("\n", i);
+        if (j4 === -1) j4 = n;
+        out += "<span class='p'>" + esc1(code.slice(i, j4)) + "</span>";
+        i = j4;
+        continue;
+      }
+      // 数字
+      var mNum = /^[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?[lLuUfF]*/.exec(rest);
+      if (mNum && mNum[0]) {
+        out += "<span class='n'>" + esc1(mNum[0]) + "</span>";
+        i += mNum[0].length;
+        continue;
+      }
+      // 标识符 / 关键字
+      var mId = /^[A-Za-z_][A-Za-z0-9_]*/.exec(rest);
+      if (mId) {
+        var word = mId[0];
+        out += KW_SET[word] ? "<span class='k'>" + word + "</span>" : esc1(word);
+        i += word.length;
+        continue;
+      }
+      out += esc1(c);
+      i++;
+    }
+    return out;
+  };
+
+  /* ---------------- 抽题 ---------------- */
+
+  C.shuffle = function (arr, rng) {
+    var a = arr.slice();
+    var rand = rng || Math.random;
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  };
+
+  // 随机取 count 道（不足则全取）
+  C.pick = function (list, count) {
+    var a = C.shuffle(list);
+    var n = Math.max(0, Math.min(count, a.length));
+    return a.slice(0, n);
+  };
+
+  /* ---------------- 判分 ---------------- */
+
+  // 选择题：userAnswer 为 'A'-'D'
+  C.judgeChoice = function (q, userAnswer) {
+    return String(userAnswer || "").trim().toUpperCase() === String(q.answer || "").trim().toUpperCase();
+  };
+
+  /**
+   * 改错题判分
+   * @param q 题目对象（含 code / answerRaw）
+   * @param entries [{line: 0基行号, input: 改正后代码}]，未修改行不传
+   * @returns {correct, statuses, reminders, fullwidth, extras}
+   */
+  C.judgeFix = function (q, entries) {
+    var codeLines = String(q.code || "").split(/\r?\n/);
+    var pairs = C.parseFixAnswer(q.answerRaw);
+    var entriesByLine = {};
+    (entries || []).forEach(function (e) {
+      if (e && typeof e.line === "number" && e.line >= 0 && e.input != null && String(e.input).trim() !== "") {
+        entriesByLine[e.line] = String(e.input);
+      }
+    });
+
+    var used = {};
+    var statuses = [];
+    var reminders = [];
+    var fullwidth = [];
+
+    pairs.forEach(function (pair) {
+      var origWS = C.stripWS(pair.orig);
+      var best = null;
+      Object.keys(entriesByLine).forEach(function (ls) {
+        var lineIdx = Number(ls);
+        var lineText = codeLines[lineIdx] || "";
+        if (C.stripWS(lineText).indexOf(origWS) !== -1) {
+          var cmp = C.compare3(entriesByLine[lineIdx], pair.fix);
+          var rank = cmp === "strict" ? 2 : (cmp === "lenient" ? 1 : 0);
+          if (best === null || rank > best.rank) {
+            best = { line: lineIdx, cmp: cmp };
+          }
+        }
+      });
+
+      if (best === null) {
+        statuses.push({ pair: pair, status: "missing", reason: "未找到该处的修改" });
+        return;
+      }
+      used[best.line] = true;
+      var input = entriesByLine[best.line];
+      var lineText = codeLines[best.line] || "";
+      // "没真正改"：与整行代码一致（去空白、保留分号）——防止 G5 ② b++ → b++; 这类只补分号修正被误判
+      if (C.sameCode(input, lineText)) {
+        var reason = "该处没有真正修改";
+        if (C.norm(pair.fix) === C.norm(pair.orig)) {
+          reason += "（参考答案：" + pair.fix + "——该处为格式修正，注意补充分号等）";
+        }
+        statuses.push({ pair: pair, status: "unchanged", reason: reason });
+      } else if (best.cmp === "strict") {
+        statuses.push({ pair: pair, status: "ok", reason: "" });
+      } else if (best.cmp === "lenient") {
+        statuses.push({ pair: pair, status: "lenient", reason: "宽松通过（严格写法应为：" + pair.fix + "）" });
+        reminders.push({ orig: pair.orig, fix: pair.fix, input: input });
+      } else if (best.cmp === "fullwidth") {
+        statuses.push({ pair: pair, status: "wrong", reason: "参考答案：" + pair.fix });
+        fullwidth.push({ orig: pair.orig, fix: pair.fix, input: input, chars: C.findFullwidth(input) });
+      } else {
+        statuses.push({ pair: pair, status: "wrong", reason: "参考答案：" + pair.fix });
+      }
+    });
+
+    // 改了不该改的行（选错行）；与原文一致（去空白）的"没改"不算
+    var extras = [];
+    Object.keys(entriesByLine).forEach(function (ls) {
+      var lineIdx = Number(ls);
+      if (!used[lineIdx]) {
+        var lineText = codeLines[lineIdx] || "";
+        if (C.stripWS(entriesByLine[lineIdx]) !== C.stripWS(lineText)) {
+          extras.push({ line: lineIdx, lineText: lineText, input: entriesByLine[lineIdx] });
+        }
+      }
+    });
+
+    var correct =
+      extras.length === 0 &&
+      statuses.every(function (s) {
+        return s.status === "ok" || s.status === "lenient";
+      });
+
+    return { correct: correct, statuses: statuses, reminders: reminders, fullwidth: fullwidth, extras: extras };
+  };
+
+  /**
+   * 填空题判分
+   * @param q 题目对象（含 answerRaw）
+   * @param answers 数组，顺序对应 findBlanks 的顺序；未填传 "" 或 null
+   * @returns {correct, statuses, reminders, fullwidth}
+   */
+  C.judgeBlank = function (q, answers) {
+    var expected = C.parseBlankAnswer(q.answerRaw);
+    var statuses = [];
+    var reminders = [];
+    var fullwidth = [];
+    expected.forEach(function (exp, i) {
+      var u = answers && answers[i] != null ? String(answers[i]) : "";
+      if (u.trim() === "") {
+        statuses.push({ index: i, status: "missing", expect: exp });
+        return;
+      }
+      var cmp = C.compare3(u, exp);
+      if (cmp === "strict") {
+        statuses.push({ index: i, status: "ok", expect: exp });
+      } else if (cmp === "lenient") {
+        statuses.push({ index: i, status: "lenient", expect: exp, input: u });
+        reminders.push({ index: i, input: u, expect: exp });
+      } else if (cmp === "fullwidth") {
+        statuses.push({ index: i, status: "wrong", expect: exp, input: u });
+        fullwidth.push({ index: i, input: u, expect: exp, chars: C.findFullwidth(u) });
+      } else {
+        statuses.push({ index: i, status: "wrong", expect: exp });
+      }
+    });
+    var correct = statuses.every(function (s) {
+      return s.status === "ok" || s.status === "lenient";
+    });
+    return { correct: correct, statuses: statuses, reminders: reminders, fullwidth: fullwidth };
+  };
+
+  /* ---------------- 记录统计 ---------------- */
+
+  /**
+   * 记录一条答题结果并返回更新后的 records（v1.2：无 SRS 间隔，答对即移出错题本）。
+   * mode 仅用于 history 标签：'random' | 'type' | 'wrong' | 'fav'
+   */
+  C.applyResult = function (records, q, correct, mode) {
+    var r = records;
+    r.totalAnswered = (r.totalAnswered || 0) + 1;
+    if (correct) r.totalCorrect = (r.totalCorrect || 0) + 1;
+
+    var type = q.type || "choice";
+    var bt = r.byType[type] || (r.byType[type] = { answered: 0, correct: 0 });
+    bt.answered++;
+    if (correct) bt.correct++;
+
+    var qid = String(q.id);
+    var now = Date.now();
+    if (correct) {
+      delete r.wrong[qid]; // 答对即移出错题本（任何模式）
+    } else {
+      var w = r.wrong[qid] || { id: qid, type: type, wrongCount: 0, ts: 0 };
+      w.wrongCount++;
+      w.ts = now;
+      r.wrong[qid] = w;
+    }
+
+    r.history.push({ ts: now, mode: mode, type: type, qid: qid, correct: correct });
+    if (r.history.length > 500) r.history = r.history.slice(-500);
+    return r;
+  };
+
+  /* ---------------- 收藏 ---------------- */
+
+  // 切换收藏状态，返回是否已收藏
+  C.toggleFav = function (records, q) {
+    var qid = String(q.id);
+    if (!records.fav) records.fav = {};
+    if (records.fav[qid]) {
+      delete records.fav[qid];
+      return false;
+    }
+    records.fav[qid] = { id: qid, type: q.type || "choice", ts: Date.now() };
+    return true;
+  };
+
+  C.isFav = function (records, qid) {
+    return !!(records.fav && records.fav[String(qid)]);
+  };
+
+  /* ---------------- 记录迁移 / 容错（版本兼容） ---------------- */
+  // 任何历史版本/损坏数据 → 结构完整的新 records：保留旧数据、绝不抛错
+  C.normalizeRecords = function (raw) {
+    var r = { totalAnswered: 0, totalCorrect: 0, byType: {}, wrong: {}, fav: {}, history: [] };
+    if (!raw || typeof raw !== "object") return r;
+
+    r.totalAnswered = Math.max(0, Number(raw.totalAnswered) || 0);
+    r.totalCorrect = Math.max(0, Math.min(r.totalAnswered, Number(raw.totalCorrect) || 0));
+
+    ["choice", "fix", "blank"].forEach(function (t) {
+      var b = raw.byType && raw.byType[t];
+      var answered = Math.max(0, Number(b && b.answered) || 0);
+      var correct = Math.max(0, Math.min(answered, Number(b && b.correct) || 0));
+      r.byType[t] = { answered: answered, correct: correct };
+    });
+
+    if (raw.wrong && typeof raw.wrong === "object") {
+      Object.keys(raw.wrong).forEach(function (id) {
+        var w = raw.wrong[id];
+        if (!w || typeof w !== "object") return;
+        var type = w.type === "fix" || w.type === "blank" ? w.type : "choice";
+        r.wrong[String(id)] = {
+          id: String(id),
+          type: type,
+          wrongCount: Math.max(1, Number(w.wrongCount) || 1),
+          ts: Number(w.ts) || 0
+        };
+      });
+    }
+
+    if (raw.fav && typeof raw.fav === "object") {
+      Object.keys(raw.fav).forEach(function (id) {
+        var f = raw.fav[id];
+        var type = f && (f.type === "fix" || f.type === "blank" || f.type === "choice")
+          ? f.type
+          : (/^G\d/i.test(id) ? "fix" : (/^T\d/i.test(id) ? "blank" : "choice"));
+        r.fav[String(id)] = { id: String(id), type: type, ts: Number(f && f.ts) || 0 };
+      });
+    }
+
+    if (Array.isArray(raw.history)) {
+      r.history = raw.history.map(function (h) {
+        if (!h || typeof h !== "object") return null;
+        return {
+          ts: Number(h.ts) || 0,
+          mode: String(h.mode || ""),
+          type: h.type === "fix" || h.type === "blank" ? h.type : "choice",
+          qid: String(h.qid != null ? h.qid : ""),
+          correct: !!h.correct
+        };
+      }).filter(Boolean).slice(-500);
+    }
+    return r;
+  };
+
+  // 合并记录（导入"合并"选项）：计数相加、错题并集、收藏并集、历史拼接
+  C.mergeRecords = function (base, inc) {
+    var r = JSON.parse(JSON.stringify(base));
+    r.totalAnswered = (r.totalAnswered || 0) + (inc.totalAnswered || 0);
+    r.totalCorrect = (r.totalCorrect || 0) + (inc.totalCorrect || 0);
+    ["choice", "fix", "blank"].forEach(function (t) {
+      var a = r.byType[t] || (r.byType[t] = { answered: 0, correct: 0 });
+      var b = inc.byType && inc.byType[t] ? inc.byType[t] : {};
+      a.answered += b.answered || 0;
+      a.correct += b.correct || 0;
+    });
+    Object.keys(inc.wrong || {}).forEach(function (id) {
+      var w = inc.wrong[id];
+      if (r.wrong[id]) {
+        if ((w.wrongCount || 0) > (r.wrong[id].wrongCount || 0)) {
+          r.wrong[id].wrongCount = w.wrongCount;
+          r.wrong[id].ts = w.ts;
+        }
+      } else {
+        r.wrong[id] = { id: String(id), type: w.type || "choice", wrongCount: w.wrongCount || 1, ts: w.ts || 0 };
+      }
+    });
+    if (!r.fav) r.fav = {};
+    Object.keys(inc.fav || {}).forEach(function (id) {
+      var f = inc.fav[id];
+      if (!r.fav[id]) r.fav[id] = { id: String(id), type: f.type || "choice", ts: f.ts || 0 };
+    });
+    r.history = (r.history || []).concat(inc.history || []).slice(-500);
+    return r;
+  };
+
+  // 近 N 天某题型统计：{answered, correct, rate|null}
+  C.recentRate = function (records, type, days) {
+    var cutoff = Date.now() - days * 86400000;
+    var a = 0, c = 0;
+    (records.history || []).forEach(function (h) {
+      if (h.type === type && h.ts >= cutoff) {
+        a++;
+        if (h.correct) c++;
+      }
+    });
+    return a ? { answered: a, correct: c, rate: Math.round((c / a) * 100) } : { answered: 0, correct: 0, rate: null };
+  };
+
+  // 近 N 天每日答题序列（含空档），用于曲线图
+  C.dailySeries = function (records, days) {
+    var map = {};
+    (records.history || []).forEach(function (h) {
+      var d = new Date(h.ts);
+      var key = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+      var e = map[key] || (map[key] = { answered: 0, correct: 0 });
+      e.answered++;
+      if (h.correct) e.correct++;
+    });
+    var out = [];
+    for (var i = days - 1; i >= 0; i--) {
+      var dd = new Date(Date.now() - i * 86400000);
+      var key = dd.getFullYear() + "-" + (dd.getMonth() + 1) + "-" + dd.getDate();
+      var e = map[key] || { answered: 0, correct: 0 };
+      e.label = (dd.getMonth() + 1) + "/" + dd.getDate();
+      out.push(e);
+    }
+    return out;
+  };
+
+  // 连续打卡天数（今天没练不打断，从昨天起算）
+  C.streakDays = function (records) {
+    var has = {};
+    (records.history || []).forEach(function (h) {
+      var d = new Date(h.ts);
+      has[d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()] = true;
+    });
+    var streak = 0;
+    var d = new Date();
+    if (!has[d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()]) {
+      d.setDate(d.getDate() - 1);
+    }
+    while (has[d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()]) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  };
+
+  g.CK_CORE = C;
+  if (typeof module !== "undefined" && module.exports) module.exports = C;
+})(typeof window !== "undefined" ? window : globalThis);
+
+/*
+ * C_KING 应用逻辑 v1.2
+ * 页面流程 / 作答交互 / 记录统计（localStorage，版本迁移+降级）/ 导出导入（覆盖/合并）/
+ * 错题本（随时可练，答对即移出）/ 收藏夹 / 统计增强 / 日夜间主题 / 键盘快捷键 / 结果复盘
+ * 依赖：window.CK_DATA（data.js）、window.CK_CORE（core.js）
+ */
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var D = window.CK_DATA;
+  var C = window.CK_CORE;
+
+  /* ================= 工具 ================= */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function fmtDate(ts) {
+    if (!ts) return "—";
+    var d = new Date(ts);
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  var TYPE_LABEL = { choice: "选择题", fix: "程序改错", blank: "程序填空" };
+
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  /* ================= 新手提示 ================= */
+  var TIPS_KEY = "CK_TIPS";
+  var TIPS = {
+    home: "欢迎喵！点上面三个大按钮开始抽查：🎲 随机抽题（三题型混合）、📚 按题型抽题、📖 错题重练；下方工具栏可看统计 / 错题本 / 收藏夹 / 设置。",
+    setup: "题目数量可以自己填（1~上限），也可以点 5 / 10 / 20 / 全部 一键选择，回车或点「开始抽查」就出发喵～",
+    result: "点击题目行可展开复盘（原题 + 答案解析），点 ⭐ 可收藏，🙈 可只看错题。",
+    stats: "这里看总正确率、连续打卡、近 7 天曲线和错题分析；记录可导出迁移到别的设备。",
+    wrong: "答错的题自动收录，答对即自动移出；可随时重练，点题目行可复盘。",
+    favorites: "做题中、结果页、错题本里点 ⭐ 就能收藏，这里统一查看、取消、重练。",
+    settings: "日夜模式、新手提示开关、导出/导入记录都在这里；「导出 → 导入」可在换设备时迁移学习记录。"
+  };
+  var TIPS_QUIZ = {
+    choice: "点选项作答，或直接按键盘 1-4 键；答完自动显示正确答案和解析。",
+    fix: "先点击代码行标记错误位置，再在下方填写改正后的代码（可标记多处），最后点「提交本题」。",
+    blank: "按顺序填写下划线处的代码（含引号的空需原样输入引号），全部填完再点「提交本题」。"
+  };
+  var tipTimer = null;
+  function tipsEnabled() { return storage.get(TIPS_KEY) !== "0"; }
+  function showTip(text) {
+    var box = $("tips-box");
+    if (!box) return;
+    if (!tipsEnabled() || !text) { box.classList.add("hidden"); return; }
+    $("tips-text").textContent = text;
+    box.classList.remove("hidden");
+    if (tipTimer) clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () { box.classList.add("hidden"); }, 6000);
+  }
+  function refreshTipsBtn() {
+    var b = $("btn-tips");
+    if (b) b.textContent = tipsEnabled() ? "✅ 开启" : "⏸ 关闭";
+  }
+
+  /* ================= 存储（带降级） ================= */
+  var STORE_KEY = "CK_RECORDS_v1"; // 键名长期不变，靠 normalizeRecords 做版本迁移
+  var THEME_KEY = "CK_THEME";
+  var storage = (function () {
+    var mem = {};
+    var ls = null;
+    try {
+      ls = window.localStorage;
+      ls.setItem("__ck_probe__", "1");
+      ls.removeItem("__ck_probe__");
+    } catch (e) { ls = null; }
+    return {
+      ok: !!ls,
+      get: function (k) {
+        if (ls) { try { return ls.getItem(k); } catch (e) { return null; } }
+        return k in mem ? mem[k] : null;
+      },
+      set: function (k, v) {
+        if (ls) { try { ls.setItem(k, v); return true; } catch (e) { return false; } }
+        mem[k] = v;
+        return true;
+      }
+    };
+  })();
+
+  // 任何历史版本/损坏数据 → 统一结构（不崩溃、不丢有效数据）
+  function loadRecords() {
+    try {
+      return C.normalizeRecords(JSON.parse(storage.get(STORE_KEY)));
+    } catch (e) {
+      return C.normalizeRecords(null);
+    }
+  }
+  function saveRecords(r) {
+    if (!storage.set(STORE_KEY, JSON.stringify(r))) {
+      toast("⚠ 当前环境不允许保存记录，本次数据仅内存有效，请及时导出");
+    }
+  }
+
+  /* ================= 主题 / 字号 ================= */
+  function applyTheme(mode) {
+    document.documentElement.dataset.theme = mode;
+    var b = $("btn-theme");
+    if (b) b.textContent = mode === "dark" ? "☀️ 日间" : "🌙 夜间";
+  }
+  /* ================= 统一弹窗 ================= */
+  function showModal(title, msg, buttons) {
+    $("modal-title").textContent = title;
+    $("modal-msg").innerHTML = msg;
+    var box = $("modal-actions");
+    box.innerHTML = "";
+    (buttons || []).forEach(function (b) {
+      var btn = el("button", "btn " + (b.cls || ""), b.label);
+      btn.addEventListener("click", function () {
+        hideModal();
+        if (b.onClick) b.onClick();
+      });
+      box.appendChild(btn);
+    });
+    $("modal-mask").classList.remove("hidden");
+  }
+  function hideModal() { $("modal-mask").classList.add("hidden"); }
+
+  /* ================= 视图切换 ================= */
+  var VIEWS = ["view-home", "view-setup", "view-quiz", "view-result", "view-stats", "view-wrong", "view-favorites", "view-settings"];
+  function showView(name) {
+    VIEWS.forEach(function (v) { $(v).classList.add("hidden"); });
+    $("view-" + name).classList.remove("hidden");
+    showTip(name === "quiz" ? null : TIPS[name]); // 答题页提示由 renderQuestion 按题型给出
+    window.scrollTo(0, 0);
+  }
+
+  /* ================= 出题 ================= */
+  var state = {
+    mode: null,        // 'random' | 'type' | 'wrong' | 'fav'
+    typeFilter: null,  // 'choice' | 'fix' | 'blank'
+    count: 10,
+    pool: [],
+    idx: 0,
+    correct: 0,
+    results: [],       // [{item, ok}]
+    answered: false,   // 当前题是否已作答
+    sessionUsed: {},   // 本次会话已抽过的题（避免立即重复）
+    wrongOnly: false   // 结果页只看错题
+  };
+
+  function poolSize() {
+    if (state.mode === "random") return D.meta.total;
+    if (state.mode === "type") {
+      if (state.typeFilter === "choice") return D.meta.choiceCount;
+      return state.typeFilter === "fix" ? D.meta.fixCount : D.meta.blankCount;
+    }
+    if (state.mode === "wrong") return Object.keys(loadRecords().wrong).length;
+    return Object.keys(loadRecords().fav).length; // fav
+  }
+
+  function buildPool(count) {
+    var list = [];
+    if (state.mode === "random") {
+      list = D.choice.map(function (q) { return { kind: "choice", q: q }; })
+        .concat(D.program.map(function (q) { return { kind: q.type, q: q }; }));
+    } else if (state.mode === "type") {
+      if (state.typeFilter === "choice") {
+        list = D.choice.map(function (q) { return { kind: "choice", q: q }; });
+      } else {
+        list = D.program.filter(function (q) { return q.type === state.typeFilter; })
+          .map(function (q) { return { kind: q.type, q: q }; });
+      }
+    } else if (state.mode === "wrong") {
+      var wrec = loadRecords();
+      D.choice.forEach(function (q) {
+        if (wrec.wrong[String(q.id)]) list.push({ kind: "choice", q: q });
+      });
+      D.program.forEach(function (q) {
+        if (wrec.wrong[String(q.id)]) list.push({ kind: q.type, q: q });
+      });
+    } else { // fav
+      var frec = loadRecords();
+      D.choice.forEach(function (q) {
+        if (frec.fav[String(q.id)]) list.push({ kind: "choice", q: q });
+      });
+      D.program.forEach(function (q) {
+        if (frec.fav[String(q.id)]) list.push({ kind: q.type, q: q });
+      });
+    }
+    // 会话内去重（随机/题型）：优先抽没做过的，不够再补
+    if (state.mode === "random" || state.mode === "type") {
+      var fresh = list.filter(function (it) { return !state.sessionUsed[String(it.q.id)]; });
+      var used = list.filter(function (it) { return state.sessionUsed[String(it.q.id)]; });
+      var picked = C.pick(fresh, count);
+      if (picked.length < count) picked = picked.concat(C.pick(used, count - picked.length));
+      return picked;
+    }
+    return C.pick(list, count);
+  }
+
+  /* ================= 设置页 ================= */
+  function openSetup(mode) {
+    state.mode = mode;
+    state.typeFilter = mode === "type" ? "choice" : null;
+
+    if ((mode === "wrong" || mode === "fav") && poolSize() === 0) {
+      toast(mode === "wrong" ? "暂无错题喵，先去刷几道吧 📚" : "暂无收藏喵，做题时点 ⭐ 收藏吧");
+      showView("home");
+      return;
+    }
+
+    var titles = { random: "🎲 随机抽题", type: "📚 按题型抽题", wrong: "📖 错题重练", fav: "⭐ 收藏夹重练" };
+    var descs = {
+      random: "从全部题库（选择题 + 改错 + 填空）随机抽取，三种题型混合练习。",
+      type: "先选题型，再从该题型题库中抽取。",
+      wrong: "错题本中的题随时可练、不限次数，答对自动移出错题本。",
+      fav: "从收藏夹中抽题练习（不影响收藏状态）。"
+    };
+    $("setup-title").textContent = titles[mode];
+    $("setup-desc").textContent = descs[mode];
+
+    var chipsBox = $("setup-chips");
+    chipsBox.innerHTML = "";
+    chipsBox.classList.toggle("hidden", mode !== "type");
+    if (mode === "type") {
+      var defs = [
+        { key: "choice", label: "选择题（118）" },
+        { key: "fix", label: "程序改错（10）" },
+        { key: "blank", label: "程序填空（17）" }
+      ];
+      defs.forEach(function (d) {
+        var chip = el("button", "chip", d.label);
+        chip.classList.toggle("active", d.key === state.typeFilter);
+        chip.addEventListener("click", function () {
+          state.typeFilter = d.key;
+          chipsBox.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+          chip.classList.add("active");
+          syncCountUI();
+        });
+        chipsBox.appendChild(chip);
+      });
+    }
+
+    $("setup-count").value = 10;
+    syncCountUI();
+    showView("setup");
+  }
+
+  function syncCountUI() {
+    var max = poolSize();
+    var input = $("setup-count");
+    input.max = max;
+    $("setup-max").textContent = "（共 " + max + " 题，可自定义 1~" + max + "）";
+    if (parseInt(input.value, 10) > max) input.value = max;
+
+    var presets = $("setup-presets");
+    presets.innerHTML = "";
+    [5, 10, 20, max].forEach(function (n) {
+      var label = n === max ? "全部" : String(n);
+      var b = el("button", "preset", label);
+      b.addEventListener("click", function () {
+        input.value = n;
+        presets.querySelectorAll(".preset").forEach(function (p) { p.classList.remove("active"); });
+        b.classList.add("active");
+      });
+      presets.appendChild(b);
+    });
+  }
+
+  function startQuiz() {
+    var n = parseInt($("setup-count").value, 10);
+    var max = poolSize();
+    if (isNaN(n) || n < 1) n = 10;
+    n = Math.min(n, max);
+    state.pool = buildPool(n);
+    if (state.pool.length === 0) { toast("没有可抽的题喵"); return; }
+    state.pool.forEach(function (it) { state.sessionUsed[String(it.q.id)] = true; });
+    if (Object.keys(state.sessionUsed).length > 600) state.sessionUsed = {};
+    state.idx = 0;
+    state.correct = 0;
+    state.results = [];
+    state.wrongOnly = false;
+    renderQuestion();
+    showView("quiz");
+  }
+
+  /* ================= 答题渲染 ================= */
+  function renderQuestion() {
+    var item = state.pool[state.idx];
+    state.answered = false;
+    $("quiz-progress").textContent = "第 " + (state.idx + 1) + " / " + state.pool.length + " 题 · " + TYPE_LABEL[item.kind];
+    $("quiz-score").textContent = "✓ " + state.correct + " 分";
+    $("quiz-progress-fill").style.width = Math.round((state.idx / state.pool.length) * 100) + "%";
+    var body = $("quiz-body");
+    body.innerHTML = "";
+    if (item.kind === "choice") renderChoice(body, item);
+    else if (item.kind === "fix") renderFix(body, item);
+    else renderBlank(body, item);
+    showTip(TIPS_QUIZ[item.kind]); // 按题型提示
+  }
+
+  function finishQuestion(item, ok) {
+    state.correct += ok ? 1 : 0;
+    state.results.push({ item: item, ok: ok });
+    var rec = loadRecords();
+    C.applyResult(rec, item.q, ok, state.mode);
+    saveRecords(rec);
+    $("quiz-score").textContent = "✓ " + state.correct + " 分";
+  }
+
+  function nextButton(container) {
+    var btn = el("button", "btn primary", state.idx + 1 < state.pool.length ? "下一题 ▶" : "查看结果 🏁");
+    btn.addEventListener("click", nextQuestion);
+    container.appendChild(btn);
+  }
+
+  function nextQuestion() {
+    state.idx++;
+    if (state.idx >= state.pool.length) showResult();
+    else renderQuestion();
+  }
+
+  function stemBox(stem) {
+    var cls = /[{}]|#include|main\s*\(/.test(stem) ? "qstem code" : "qstem";
+    return el("div", cls, esc(stem));
+  }
+
+  /* ---------- 收藏按钮（做题中/结果页/错题本/收藏夹通用） ---------- */
+  function makeFavBtn(q) {
+    var qid = String(q.id);
+    var b = el("button", "fav-btn");
+    function refresh() {
+      var on = C.isFav(loadRecords(), qid);
+      b.textContent = on ? "★ 已收藏" : "☆ 收藏";
+      b.classList.toggle("on", on);
+    }
+    b.addEventListener("click", function (e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      var rec = loadRecords();
+      var added = C.toggleFav(rec, q);
+      saveRecords(rec);
+      refresh();
+      toast(added ? "已加入收藏喵 ⭐" : "已取消收藏喵");
+    });
+    refresh();
+    return b;
+  }
+
+  /* ---------- 选择题 ---------- */
+  function renderChoice(body, item) {
+    var q = item.q;
+    var card = el("div", "qcard");
+    var head = el("div", "qhead-row");
+    head.appendChild(el("div", "qmeta", "选择题 · 题号 " + esc(q.id) + "（按 1-4 键作答）"));
+    head.appendChild(makeFavBtn(q));
+    card.appendChild(head);
+    card.appendChild(stemBox(q.stem));
+    var optsBox = el("div", "options");
+    ["A", "B", "C", "D"].forEach(function (k) {
+      var b = el("button", "opt", "<b>" + k + ".</b> " + esc(q.options[k]));
+      b.addEventListener("click", function () { onChoice(q, k, optsBox, card, item); });
+      optsBox.appendChild(b);
+    });
+    card.appendChild(optsBox);
+    card.appendChild(el("div", "qanswer hidden", ""));
+    card.appendChild(el("div", "qanalysis hidden", "<b>解析：</b>" + esc(q.analysis)));
+    var actions = el("div", "qactions");
+    actions.classList.add("hidden");
+    nextButton(actions);
+    card.appendChild(actions);
+    body.appendChild(card);
+  }
+
+  function onChoice(q, k, optsBox, card, item) {
+    if (state.answered) return;
+    state.answered = true;
+    item.userAnswer = k;
+    var ok = C.judgeChoice(q, k);
+    var btns = optsBox.querySelectorAll(".opt");
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+    var idx = { A: 0, B: 1, C: 2, D: 3 }[String(q.answer).toUpperCase()];
+    if (ok) {
+      btns[{ A: 0, B: 1, C: 2, D: 3 }[k]].classList.add("right");
+    } else {
+      btns[{ A: 0, B: 1, C: 2, D: 3 }[k]].classList.add("wrong");
+      if (idx != null && idx >= 0) btns[idx].classList.add("right");
+    }
+    card.querySelector(".qanswer").classList.remove("hidden");
+    card.querySelector(".qanswer").innerHTML = "✅ 正确答案：<b>" + esc(q.answer) + "</b>" + (ok ? "" : "（你的答案：" + esc(k) + " ✘）");
+    card.querySelector(".qanalysis").classList.remove("hidden");
+    card.querySelector(".qactions").classList.remove("hidden");
+    finishQuestion(item, ok);
+  }
+
+  /* ---------- 改错题 ---------- */
+  function renderFix(body, item) {
+    var q = item.q;
+    var card = el("div", "qcard");
+    var head = el("div", "qhead-row");
+    head.appendChild(el("div", "qmeta", "程序改错题 · 题号 " + esc(q.id)));
+    head.appendChild(makeFavBtn(q));
+    card.appendChild(head);
+    card.appendChild(stemBox(q.stem));
+    card.appendChild(el("div", "qstem hint", "💡 点击代码行标记错误位置，在下方填写改正后的代码，可标记多处。"));
+
+    var lines = String(q.code).split("\n");
+    var selected = {};
+    var edits = {};
+    var submitted = false;
+
+    var codebox = el("div", "codebox clickable");
+    lines.forEach(function (text, i) {
+      var row = el("div", "code-line");
+      row.appendChild(el("span", "ln", String(i + 1)));
+      var pre = el("pre", "", C.highlightC(text));
+      row.appendChild(pre);
+      row.addEventListener("click", function () {
+        if (submitted) return;
+        if (selected[i]) delete selected[i];
+        else selected[i] = true;
+        row.classList.toggle("sel", !!selected[i]);
+        updatePanel();
+      });
+      codebox.appendChild(row);
+    });
+    card.appendChild(codebox);
+
+    var panel = el("div", "fixpanel");
+    panel.appendChild(el("div", "fp-title", "✏️ 我的修改"));
+    var panelBody = el("div");
+    panel.appendChild(panelBody);
+    card.appendChild(panel);
+
+    function updatePanel() {
+      panelBody.innerHTML = "";
+      var keys = Object.keys(selected).map(Number).sort(function (a, b) { return a - b; });
+      keys.forEach(function (i) {
+        var row = el("div", "fixrow");
+        row.appendChild(el("span", "tag", "行 " + (i + 1)));
+        row.appendChild(el("span", "src", esc(lines[i].trim().slice(0, 40) || "(空行)")));
+        var input = el("input");
+        input.type = "text";
+        input.placeholder = "改正后的代码";
+        input.value = edits[i] || "";
+        input.addEventListener("input", function () { edits[i] = input.value; });
+        var rm = el("button", "rm", "✕");
+        rm.addEventListener("click", function () {
+          delete selected[i];
+          delete edits[i];
+          var rows = codebox.querySelectorAll(".code-line");
+          if (rows[i]) rows[i].classList.remove("sel");
+          updatePanel();
+        });
+        row.appendChild(input);
+        row.appendChild(rm);
+        panelBody.appendChild(row);
+      });
+      if (!keys.length) panelBody.appendChild(el("div", "fp-title", "（还没选行，点击上方代码行开始）"));
+    }
+    updatePanel();
+
+    var actions = el("div", "qactions");
+    var submit = el("button", "btn primary", "提交本题 ✅");
+    submit.addEventListener("click", submitFix);
+    actions.appendChild(submit);
+    card.appendChild(actions);
+    body.appendChild(card);
+
+    function submitFix() {
+      if (submitted) return;
+      var entries = [];
+      Object.keys(selected).forEach(function (ls) {
+        var i = Number(ls);
+        if (edits[i] && edits[i].trim() !== "") entries.push({ line: i, input: edits[i] });
+      });
+      submitted = true;
+      var r = C.judgeFix(q, entries);
+
+      var fb = el("div", "feedback");
+      r.statuses.forEach(function (s) {
+        var cls = s.status === "ok" ? "ok" : (s.status === "lenient" ? "lt" : "bad");
+        var icon = s.status === "ok" ? "✔" : (s.status === "lenient" ? "⚠" : "✘");
+        var line = "<span class='code'>" + esc(s.pair.orig) + "</span> → <span class='code'>" + esc(s.pair.fix) + "</span>";
+        var note = s.status === "ok" ? "改对" : (s.status === "lenient" ? "宽松通过：" + esc(s.reason) : esc(s.reason));
+        fb.appendChild(el("div", "fb-item " + cls, icon + " " + line + " &nbsp;—&nbsp; " + note));
+      });
+      r.extras.forEach(function (x) {
+        fb.appendChild(el("div", "fb-item bad", "✘ 你修改了不该修改的行 " + (x.line + 1) + "（" + esc(x.lineText.trim()) + "）"));
+      });
+      if (r.correct) {
+        fb.appendChild(el("div", "fb-item blue", "🎉 本题改对了！" + (r.reminders.length ? "不过有几处写法可以更规范，见下。" : "")));
+      } else {
+        fb.appendChild(el("div", "fb-item bad", "本题未得分：请对照上方反馈检查每一处。"));
+      }
+      if (r.reminders.length) {
+        var rm = el("div", "fb-remind");
+        r.reminders.forEach(function (m) {
+          rm.appendChild(el("div", "fb-item warn", "📌 你写的是 <span class='code'>" + esc(m.input) + "</span>，严格写法应为 <span class='code'>" + esc(m.fix) + "</span>（忽略多余空格 / 末尾分号可省，但建议规范书写）"));
+        });
+        fb.appendChild(rm);
+      }
+      if (r.fullwidth.length) {
+        var fw = el("div", "fb-remind");
+        r.fullwidth.forEach(function (m) {
+          var chars = (m.chars || []).map(function (c) { return "全角 " + c.full + " → 半角 " + c.half; }).join("、");
+          fw.appendChild(el("div", "fb-item fw", "🔴 你输入的是<b>中文输入法（全角）符号</b>：" + esc(chars) + " —— 全角符号在 C 语言中非法，本题判错。参考答案：<span class='code'>" + esc(m.fix) + "</span>"));
+        });
+        fb.appendChild(fw);
+      }
+      fb.appendChild(el("div", "qanalysis", "<b>解析：</b>" + esc(q.analysis) + (q.ref ? "<br><b>参考运行结果：</b>" + esc(q.ref) : "")));
+      card.insertBefore(fb, actions);
+      actions.innerHTML = "";
+      nextButton(actions);
+      state.answered = true; // 提交后允许 Enter/空格 跳题
+      finishQuestion(item, r.correct);
+    }
+  }
+
+  /* ---------- 填空题 ---------- */
+  function renderBlank(body, item) {
+    var q = item.q;
+    var card = el("div", "qcard");
+    var head = el("div", "qhead-row");
+    head.appendChild(el("div", "qmeta", "程序填空题 · 题号 " + esc(q.id)));
+    head.appendChild(makeFavBtn(q));
+    card.appendChild(head);
+    card.appendChild(stemBox(q.stem));
+    var expected = C.parseBlankAnswer(q.answerRaw);
+    card.appendChild(el("div", "qstem hint", "💡 下划线处为填空，按顺序填写代码，共 " + expected.length + " 处" + (expected.some(function (e) { return /["']/.test(e); }) ? "；含引号的空需原样输入引号" : "") + "。"));
+
+    var lines = String(q.code).split("\n");
+    var blanks = C.findBlanks(q.code);
+    var inputs = [];
+    var submitted = false;
+
+    var codebox = el("div", "codebox");
+    lines.forEach(function (text, i) {
+      var row = el("div", "code-line");
+      row.appendChild(el("span", "ln", String(i + 1)));
+      var pre = el("pre");
+      var html = "";
+      var last = 0;
+      var hasBlank = false;
+      blanks.forEach(function (b) {
+        if (b.line !== i) return;
+        hasBlank = true;
+        html += C.highlightC(text.slice(last, b.start));
+        var input = el("input", "blank-input");
+        input.type = "text";
+        input.autocomplete = "off";
+        input.style.width = Math.min(14 + b.len * 8, 300) + "px";
+        var idx = inputs.length;
+        input.dataset.blank = idx;
+        var exp = expected[idx] || "";
+        if (/["']/.test(exp)) input.placeholder = "需含引号";
+        inputs.push(input);
+        pre.appendChild(el("span", "", html));
+        pre.appendChild(input);
+        html = "";
+        last = b.end;
+      });
+      if (hasBlank) {
+        html += C.highlightC(text.slice(last));
+        pre.appendChild(el("span", "", html));
+      } else {
+        pre.innerHTML = C.highlightC(text);
+      }
+      row.appendChild(pre);
+      codebox.appendChild(row);
+    });
+    card.appendChild(codebox);
+
+    var actions = el("div", "qactions");
+    var submit = el("button", "btn primary", "提交本题 ✅");
+    submit.addEventListener("click", function () {
+      if (submitted) return;
+      submitted = true;
+      var values = inputs.map(function (inp) { return inp.value; });
+      var r = C.judgeBlank(q, values);
+
+      inputs.forEach(function (inp, i) {
+        inp.disabled = true;
+        var st = r.statuses[i] ? r.statuses[i].status : "missing";
+        if (st === "ok") inp.classList.add("ok");
+        else if (st === "lenient") inp.classList.add("lt");
+        else inp.classList.add("bad");
+        var tip = el("span", "blank-tip " + (st === "ok" ? "ok" : (st === "lenient" ? "lt" : "bad")));
+        if (st === "ok") tip.textContent = "✔";
+        else if (st === "lenient") tip.textContent = "⚠";
+        else tip.textContent = "✘ 参考答案：" + (r.statuses[i] ? r.statuses[i].expect : "");
+        inp.parentNode.insertBefore(tip, inp.nextSibling);
+      });
+
+      var fb = el("div", "feedback");
+      r.statuses.forEach(function (s) {
+        var cls = s.status === "ok" ? "ok" : (s.status === "lenient" ? "lt" : "bad");
+        var icon = s.status === "ok" ? "✔" : (s.status === "lenient" ? "⚠" : "✘");
+        var text = "第 " + (s.index + 1) + " 空";
+        var ans = "｜参考答案：" + esc(s.expect);
+        if (s.status === "ok") text += " 填对" + ans;
+        else if (s.status === "lenient") text += " 宽松通过" + ans;
+        else if (s.status === "missing") text += " 未填写" + ans + (/["']/.test(s.expect) ? "（注意：答案含引号）" : "");
+        else text += " 填错" + ans + (/["']/.test(s.expect) ? "（注意：答案含引号）" : "");
+        fb.appendChild(el("div", "fb-item " + cls, icon + " " + text));
+      });
+      if (r.correct) {
+        fb.appendChild(el("div", "fb-item blue", "🎉 本题填对了！" + (r.reminders.length ? "不过有几处写法可以更规范，见下。" : "")));
+      } else {
+        fb.appendChild(el("div", "fb-item bad", "本题未得分：请对照参考答案检查每一空。"));
+      }
+      if (r.reminders.length) {
+        var rm = el("div", "fb-remind");
+        r.reminders.forEach(function (m) {
+          rm.appendChild(el("div", "fb-item warn", "📌 第 " + (m.index + 1) + " 空你写的是 <span class='code'>" + esc(m.input) + "</span>，严格写法应为 <span class='code'>" + esc(m.expect) + "</span>"));
+        });
+        fb.appendChild(rm);
+      }
+      if (r.fullwidth.length) {
+        var fw = el("div", "fb-remind");
+        r.fullwidth.forEach(function (m) {
+          var chars = (m.chars || []).map(function (c) { return "全角 " + c.full + " → 半角 " + c.half; }).join("、");
+          fw.appendChild(el("div", "fb-item fw", "🔴 第 " + (m.index + 1) + " 空你输入的是<b>中文输入法（全角）符号</b>：" + esc(chars) + " —— 全角符号在 C 语言中非法，本题判错。参考答案：<span class='code'>" + esc(m.expect) + "</span>"));
+        });
+        fb.appendChild(fw);
+      }
+      fb.appendChild(el("div", "qanalysis", "<b>解析：</b>" + esc(q.analysis) + (q.ref ? "<br><b>参考运行结果：</b>" + esc(q.ref) : "")));
+      card.insertBefore(fb, actions);
+      actions.innerHTML = "";
+      nextButton(actions);
+      state.answered = true; // 提交后允许 Enter/空格 跳题
+      finishQuestion(item, r.correct);
+    });
+    actions.appendChild(submit);
+    card.appendChild(actions);
+    body.appendChild(card);
+  }
+
+  /* ================= 复盘详情 ================= */
+  function detailHTML(item) {
+    var q = item.q;
+    var h = "";
+    if (item.kind === "choice") {
+      h += "<div class='rd-stem'>" + esc(q.stem) + "</div>";
+      h += "<div class='rd-answer'>正确答案：" + esc(q.answer) + " ｜ 你的答案：" + esc(item.userAnswer || "—") + "</div>";
+      h += "<div class='rd-analysis'>解析：" + esc(q.analysis) + "</div>";
+    } else if (item.kind === "fix") {
+      h += "<div class='rd-stem'>" + esc(q.stem) + "</div>";
+      h += "<pre class='rd-code'>" + C.highlightC(q.code) + "</pre>";
+      h += "<div class='rd-answer'>参考答案：</div>";
+      C.parseFixAnswer(q.answerRaw).forEach(function (p) {
+        h += "<div class='rd-fix'>" + esc(p.orig) + " → <b>" + esc(p.fix) + "</b></div>";
+      });
+      h += "<div class='rd-analysis'>解析：" + esc(q.analysis) + (q.ref ? "<br>参考运行结果：" + esc(q.ref) : "") + "</div>";
+    } else {
+      h += "<div class='rd-stem'>" + esc(q.stem) + "</div>";
+      h += "<div class='rd-answer'>参考答案：</div>";
+      C.parseBlankAnswer(q.answerRaw).forEach(function (a, i) {
+        h += "<div class='rd-fix'>第 " + (i + 1) + " 空：<b>" + esc(a) + "</b></div>";
+      });
+      h += "<div class='rd-analysis'>解析：" + esc(q.analysis) + (q.ref ? "<br>参考运行结果：" + esc(q.ref) : "") + "</div>";
+    }
+    return h;
+  }
+
+  function findQ(kind, id) {
+    if (kind === "choice") {
+      return D.choice.filter(function (q) { return String(q.id) === String(id); })[0] || null;
+    }
+    return D.program.filter(function (q) { return String(q.id) === String(id); })[0] || null;
+  }
+
+  /* ================= 结果页 ================= */
+  function showResult() {
+    var n = state.pool.length;
+    var rate = Math.round((state.correct / n) * 100);
+    var big = $("result-big");
+    big.textContent = state.correct + " / " + n;
+    big.className = "big " + (rate >= 60 ? "good" : "bad");
+    $("result-note").textContent = "正确率 " + rate + "%" + (rate >= 90 ? "，太棒了喵！(ฅ'ω'ฅ)" : rate >= 60 ? "，继续加油喵！" : "，别灰心，错题本见！");
+    $("quiz-progress-fill").style.width = "100%";
+    renderResultList();
+    showView("result");
+  }
+
+  function renderResultList() {
+    var list = $("result-list");
+    list.innerHTML = "";
+    var shown = 0;
+    state.results.forEach(function (res) {
+      if (state.wrongOnly && res.ok) return;
+      shown++;
+      var item = res.item;
+      var row = el("div", "r-item");
+      row.appendChild(el("span", "mark " + (res.ok ? "ok" : "no"), res.ok ? "✔" : "✘"));
+      row.appendChild(el("span", "tid", esc(item.q.id)));
+      row.appendChild(el("span", "ttype", TYPE_LABEL[item.kind]));
+      row.appendChild(makeFavBtn(item.q));
+      row.appendChild(el("span", "arrow", "▾"));
+      var detail = el("div", "r-detail", detailHTML(item));
+      row.addEventListener("click", function () { detail.classList.toggle("open"); });
+      list.appendChild(row);
+      list.appendChild(detail);
+    });
+    if (!shown) list.appendChild(el("div", "r-item", "🎉 没有错题，全部答对啦！"));
+    $("result-hint").textContent = state.wrongOnly ? "（已过滤，只显示错题）" : "（点击题目行可复盘原题与答案解析，⭐ 可收藏）";
+    $("btn-wrong-only").textContent = state.wrongOnly ? "🙈 显示全部" : "🙈 只看错题";
+  }
+
+  /* ================= 统计页 ================= */
+  function renderStats() {
+    var rec = loadRecords();
+    var rate = rec.totalAnswered ? Math.round((rec.totalCorrect / rec.totalAnswered) * 100) : 0;
+    var streak = C.streakDays(rec);
+    var grid = $("stat-grid");
+    grid.innerHTML = "";
+    [
+      { num: rec.totalAnswered, lab: "总答题数" },
+      { num: rate + "%", lab: "总正确率" },
+      { num: Object.keys(rec.wrong).length, lab: "错题数" },
+      { num: Object.keys(rec.fav).length, lab: "收藏数" },
+      { num: streak + " 天", lab: "连续打卡" }
+    ].forEach(function (s) {
+      grid.appendChild(el("div", "stat-card", "<div class='num'>" + s.num + "</div><div class='lab'>" + s.lab + "</div>"));
+    });
+    ["choice", "fix", "blank"].forEach(function (t) {
+      var bt = rec.byType[t] || { answered: 0, correct: 0 };
+      var r7 = C.recentRate(rec, t, 7);
+      var lab = TYPE_LABEL[t] + "（" + bt.correct + "/" + bt.answered + "）";
+      var num = r7.rate === null ? "—" : r7.rate + "%";
+      var lab2 = r7.rate === null ? lab + " · 近7天无记录" : lab + " · 近7天 " + r7.correct + "/" + r7.answered;
+      grid.appendChild(el("div", "stat-card", "<div class='num' style='color:var(--ink)'>" + num + "</div><div class='lab'>" + lab2 + "</div>"));
+    });
+
+    // 近 7 天柱状图
+    var series = C.dailySeries(rec, 7);
+    var max = 1;
+    series.forEach(function (s) { if (s.answered > max) max = s.answered; });
+    var chart = $("stat-chart");
+    chart.innerHTML = "";
+    series.forEach(function (s) {
+      var col = el("div", "bar-col");
+      var stack = el("div", "bar-stack");
+      var hA = Math.max(4, Math.round((s.answered / max) * 78));
+      var hC = s.answered ? Math.max(2, Math.round((s.correct / s.answered) * hA)) : 0;
+      stack.style.height = hA + "px";
+      stack.style.background = "var(--primary-soft)";
+      var cBar = el("div", "bar-correct");
+      cBar.style.height = hC + "px";
+      stack.appendChild(cBar);
+      col.appendChild(stack);
+      col.appendChild(el("div", "bar-num", s.answered ? String(s.answered) : ""));
+      col.appendChild(el("div", "bar-label", s.label));
+      chart.appendChild(col);
+    });
+
+    // 错题分析
+    var wa = $("stat-wrong-anal");
+    wa.innerHTML = "";
+    var wrongs = Object.keys(rec.wrong).map(function (id) { return rec.wrong[id]; });
+    if (!wrongs.length) {
+      wa.appendChild(el("div", "wa-row", "暂无错题，继续保持喵 🎉"));
+    } else {
+      var byT = { choice: 0, fix: 0, blank: 0 };
+      wrongs.forEach(function (w) { byT[w.type] = (byT[w.type] || 0) + 1; });
+      ["choice", "fix", "blank"].forEach(function (t) {
+        if (byT[t]) wa.appendChild(el("div", "wa-row", "<span>" + TYPE_LABEL[t] + "</span><span>" + byT[t] + " 道</span>"));
+      });
+      var top = wrongs.slice().sort(function (a, b) { return b.wrongCount - a.wrongCount; }).slice(0, 5);
+      top.forEach(function (w) {
+        wa.appendChild(el("div", "wa-row", "<span>最易错 · " + TYPE_LABEL[w.type] + " " + esc(w.id) + "</span><span>错 " + w.wrongCount + " 次</span>"));
+      });
+    }
+
+    var hist = $("stat-hist");
+    hist.innerHTML = "";
+    var recent = rec.history.slice(-20).reverse();
+    if (!recent.length) {
+      hist.appendChild(el("div", "hist-item", "还没有答题记录，快去刷一题喵～"));
+    } else {
+      recent.forEach(function (h) {
+        var row = el("div", "hist-item");
+        var modeLabel = h.mode === "wrong" ? "错题重练" : (h.mode === "fav" ? "收藏重练" : (h.mode === "type" ? "按题型" : "随机"));
+        row.appendChild(el("span", "", fmtDate(h.ts) + " · " + modeLabel + " · " + TYPE_LABEL[h.type] + " " + esc(h.qid)));
+        row.appendChild(el("span", "mark " + (h.correct ? "ok" : "no"), h.correct ? "✔" : "✘"));
+        hist.appendChild(row);
+      });
+    }
+    showView("stats");
+  }
+
+  /* ================= 错题本 ================= */
+  function renderWrongList() {
+    var rec = loadRecords();
+    var list = $("wrong-list");
+    list.innerHTML = "";
+    var ids = Object.keys(rec.wrong);
+    if (!ids.length) {
+      list.appendChild(el("div", "r-item", "🎉 暂无错题，继续保持喵！"));
+      showView("wrong");
+      return;
+    }
+    ids.sort(function (a, b) {
+      return (rec.wrong[b].wrongCount - rec.wrong[a].wrongCount) || (rec.wrong[b].ts - rec.wrong[a].ts);
+    });
+    ids.forEach(function (id) {
+      var w = rec.wrong[id];
+      var q = findQ(w.type, id);
+      var row = el("div", "r-item");
+      row.appendChild(el("span", "mark no", "✘"));
+      var info = el("div", "info");
+      info.appendChild(el("div", "tid", esc(id) + " · " + TYPE_LABEL[w.type]));
+      info.appendChild(el("div", "sub", "错 " + w.wrongCount + " 次 · " + fmtDate(w.ts)));
+      row.appendChild(info);
+      if (q) row.appendChild(makeFavBtn(q));
+      var rm = el("button", "btn ghost small", "移除");
+      rm.addEventListener("click", function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        delete rec.wrong[id];
+        saveRecords(rec);
+        renderWrongList();
+        toast("已移除喵");
+      });
+      row.appendChild(rm);
+      var detail = q ? el("div", "r-detail", detailHTML({ kind: w.type, q: q })) : null;
+      row.addEventListener("click", function () { if (detail) detail.classList.toggle("open"); });
+      list.appendChild(row);
+      if (detail) list.appendChild(detail);
+    });
+    showView("wrong");
+  }
+
+  /* ================= 收藏夹 ================= */
+  function renderFavList() {
+    var rec = loadRecords();
+    var list = $("fav-list");
+    list.innerHTML = "";
+    var ids = Object.keys(rec.fav || {}).sort(function (a, b) {
+      return (rec.fav[b].ts || 0) - (rec.fav[a].ts || 0);
+    });
+    if (!ids.length) {
+      list.appendChild(el("div", "r-item", "暂无收藏，做题时点 ⭐ 收藏喵"));
+      showView("favorites");
+      return;
+    }
+    ids.forEach(function (id) {
+      var f = rec.fav[id];
+      var q = findQ(f.type, id);
+      if (!q) return; // 题库中已不存在的题直接跳过，不崩溃
+      var row = el("div", "r-item");
+      row.appendChild(el("span", "mark ok", "★"));
+      var info = el("div", "info");
+      info.appendChild(el("div", "tid", esc(id) + " · " + TYPE_LABEL[f.type]));
+      info.appendChild(el("div", "sub", "收藏于 " + fmtDate(f.ts)));
+      row.appendChild(info);
+      row.appendChild(makeFavBtn(q));
+      var detail = el("div", "r-detail", detailHTML({ kind: f.type, q: q }));
+      row.addEventListener("click", function () { detail.classList.toggle("open"); });
+      list.appendChild(row);
+      list.appendChild(detail);
+    });
+    if (!list.children.length) {
+      list.appendChild(el("div", "r-item", "暂无收藏，做题时点 ⭐ 收藏喵"));
+    }
+    showView("favorites");
+  }
+
+  /* ================= 导出 / 导入 ================= */
+  function exportRecords() {
+    var rec = loadRecords();
+    var blob = new Blob([JSON.stringify(rec, null, 1)], { type: "application/json" });
+    var a = document.createElement("a");
+    var d = new Date();
+    a.href = URL.createObjectURL(blob);
+    a.download = "C_KING_记录_" + d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+    toast("记录已导出喵 ⬆");
+  }
+
+  function importRecords(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var raw = JSON.parse(reader.result);
+        // 格式校验：防止误导入任意 JSON（数组/标量/残缺对象）导致覆盖为空记录
+        if (!raw || typeof raw !== "object" || Array.isArray(raw) ||
+            raw.totalAnswered == null || !raw.wrong || !raw.history) {
+          throw new Error("bad format");
+        }
+        var r = C.normalizeRecords(raw); // 旧版本文件也能安全导入
+        showModal("导入记录", "选择导入方式：<b>覆盖</b> 用文件替换当前记录；<b>合并</b> 与当前记录合并（计数相加、错题/收藏并集、历史拼接）。", [
+          { label: "取消", cls: "ghost" },
+          { label: "合并", cls: "ghost", onClick: function () { saveRecords(C.mergeRecords(loadRecords(), r)); toast("合并导入成功喵 🎉"); } },
+          { label: "覆盖", onClick: function () { saveRecords(r); toast("覆盖导入成功喵 🎉"); } }
+        ]);
+      } catch (e) {
+        toast("导入失败：文件格式不对喵");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /* ================= 键盘快捷键 ================= */
+  function onKeydown(e) {
+    if ($("view-quiz").classList.contains("hidden")) return;
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    var item = state.pool[state.idx];
+    if (!item) return;
+    if (item.kind === "choice" && !state.answered && /^[1-4]$/.test(e.key)) {
+      var box = $("quiz-body").querySelector(".options");
+      if (box) {
+        var btns = box.querySelectorAll(".opt");
+        var i = Number(e.key) - 1;
+        if (btns[i]) { btns[i].click(); if (e.preventDefault) e.preventDefault(); }
+      }
+    } else if (state.answered && (e.key === "Enter" || e.key === " ")) {
+      var nxt = $("quiz-body").querySelector(".qactions .btn.primary");
+      if (nxt) { nxt.click(); if (e.preventDefault) e.preventDefault(); }
+    }
+  }
+
+  /* ================= 事件绑定 ================= */
+  function bind() {
+    $("btn-random").addEventListener("click", function () { openSetup("random"); });
+    $("btn-type").addEventListener("click", function () { openSetup("type"); });
+    $("btn-wrong").addEventListener("click", function () { openSetup("wrong"); });
+    $("btn-stats").addEventListener("click", renderStats);
+    $("btn-wronglist").addEventListener("click", renderWrongList);
+    $("btn-favlist").addEventListener("click", renderFavList);
+    $("btn-settings").addEventListener("click", function () { showView("settings"); });
+
+    $("btn-theme").addEventListener("click", function () {
+      var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      storage.set(THEME_KEY, next);
+      applyTheme(next);
+      toast(next === "dark" ? "已切换夜间模式喵 🌙" : "已切换日间模式喵 ☀️");
+    });
+    $("btn-tips").addEventListener("click", function () {
+      var on = !tipsEnabled();
+      storage.set(TIPS_KEY, on ? "1" : "0");
+      refreshTipsBtn();
+      if (!on) {
+        if (tipTimer) clearTimeout(tipTimer);
+        $("tips-box").classList.add("hidden");
+      }
+      toast(on ? "新手提示已开启喵 💡" : "新手提示已关闭喵");
+    });
+    $("tips-close").addEventListener("click", function () {
+      if (tipTimer) clearTimeout(tipTimer);
+      $("tips-box").classList.add("hidden");
+    });
+    $("btn-export").addEventListener("click", exportRecords);
+    $("btn-import").addEventListener("click", function () { $("import-file").click(); });
+    $("import-file").addEventListener("change", function (e) {
+      var input = e.target;
+      if (input.files && input.files[0]) importRecords(input.files[0]);
+      input.value = "";
+    });
+    $("btn-quit").addEventListener("click", function () {
+      var answered = state.results.length;
+      showModal("退出本次练习？", "已答 <b>" + answered + "</b> 题已计入记录，剩余题目将放弃，不重复计分。确定退出吗喵？", [
+        { label: "继续练习", cls: "primary" },
+        { label: "退出", cls: "ghost", onClick: function () {
+          state.pool = [];
+          state.results = [];
+          state.idx = 0;
+          state.correct = 0;
+          state.answered = false;
+          $("quiz-progress-fill").style.width = "0%";
+          showView("home");
+          toast("已退出本次练习喵");
+        } }
+      ]);
+    });
+
+    $("btn-start").addEventListener("click", startQuiz);
+    $("setup-count").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") startQuiz();
+    });
+    $("btn-setup-back").addEventListener("click", function () { showView("home"); });
+
+    $("btn-again").addEventListener("click", startQuiz);
+    $("btn-home").addEventListener("click", function () { showView("home"); });
+    $("btn-wrong-only").addEventListener("click", function () {
+      state.wrongOnly = !state.wrongOnly;
+      renderResultList();
+    });
+
+    $("btn-stats-back").addEventListener("click", function () { showView("home"); });
+    $("btn-stats-clear").addEventListener("click", function () {
+      showModal("清空统计", "确定清空全部答题记录（含错题本、收藏夹）吗喵？此操作不可恢复。", [
+        { label: "取消", cls: "ghost" },
+        { label: "确定清空", onClick: function () { saveRecords(C.normalizeRecords(null)); renderStats(); toast("记录已清空喵"); } }
+      ]);
+    });
+
+    $("btn-wrong-back").addEventListener("click", function () { showView("home"); });
+    $("btn-wrong-practice").addEventListener("click", function () { openSetup("wrong"); });
+
+    $("btn-fav-back").addEventListener("click", function () { showView("home"); });
+    $("btn-fav-practice").addEventListener("click", function () { openSetup("fav"); });
+
+    $("btn-settings-back").addEventListener("click", function () { showView("home"); });
+
+    $("modal-mask").addEventListener("click", function (e) {
+      if (e.target === $("modal-mask")) hideModal();
+    });
+    document.addEventListener("keydown", onKeydown);
+  }
+
+  /* ================= 启动 ================= */
+  applyTheme(storage.get(THEME_KEY) === "dark" ? "dark" : "light");
+  bind();
+  refreshTipsBtn();
+  if (!storage.ok) toast("⚠ 当前浏览器不允许保存记录，答题数据仅本次有效，可随时导出");
+  showView("home");
+})();
+
+</script>
+</body>
+</html>
