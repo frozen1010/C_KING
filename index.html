@@ -3724,6 +3724,7 @@ if (typeof module !== "undefined" && module.exports) {
       showView("learning");
       return;
     }
+    var targetDetail = null;
     Object.keys(R).forEach(function (key) {
       var e = R[key];
       var row = el("div", "r-item");
@@ -3734,12 +3735,20 @@ if (typeof module !== "undefined" && module.exports) {
       row.appendChild(info);
       row.appendChild(el("span", "arrow", "▾"));
       var detail = el("div", "r-detail review-text", esc(e.text));
-      if (key === expandTag) detail.classList.add("open");
+      if (key === expandTag) {
+        detail.classList.add("open");
+        targetDetail = detail; // 跳转目标：滚动到该知识点的复习文本
+      }
       row.addEventListener("click", function () { detail.classList.toggle("open"); });
       list.appendChild(row);
       list.appendChild(detail);
     });
     showView("learning");
+    // 点击知识点跳转时，自动滚动到该知识点的复习文本区域（进可视范围即可，不要求完全居中）
+    if (targetDetail) {
+      try { targetDetail.scrollIntoView({ block: "center" }); }
+      catch (e) { try { targetDetail.scrollIntoView(); } catch (e2) {} }
+    }
   }
 
   // 学习中心返回目标：回到跳转前的页面（做题页/统计页等）
