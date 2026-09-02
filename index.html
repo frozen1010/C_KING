@@ -92,22 +92,41 @@ button { font-family: inherit; cursor: pointer; }
 /* ---------- 主页菜单 ---------- */
 .menu { display: flex; flex-direction: column; gap: 14px; margin: 26px auto 18px; max-width: 420px; }
 .big-btn {
-  border: none; border-radius: 16px;
-  padding: 20px 24px; font-size: 19px; font-weight: 700;
+  border: 2px solid var(--border); border-radius: 16px;
+  padding: 18px 24px; font-size: 18px; font-weight: 700;
   background: var(--card); color: var(--ink);
   box-shadow: var(--shadow);
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease, border-color 0.12s ease, background 0.15s ease;
 }
-.big-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(38, 50, 74, 0.14); }
 .big-btn:active { transform: scale(0.98); }
-.big-btn .ico { font-size: 26px; }
-.big-btn.green { background: linear-gradient(135deg, #37b24d, #2b8a3e); color: #fff; }
-.big-btn.blue { background: linear-gradient(135deg, #4c6ef5, #3b5bdb); color: #fff; }
-.big-btn.orange { background: linear-gradient(135deg, #fd7e14, #e8590c); color: #fff; }
-.big-btn.purple { background: linear-gradient(135deg, #9775fa, #7048e8); color: #fff; }
+.big-btn .ico { font-size: 24px; }
+/* 描边 + 彩色字（参考返回按钮：不整块亮色填充） */
+.big-btn.green { border-color: #37b24d; color: #2f9e44; }
+.big-btn.blue  { border-color: #4c6ef5; color: #3b5bdb; }
+.big-btn.orange { border-color: #fd7e14; color: #e8590c; }
+.big-btn.purple { border-color: #9775fa; color: #7048e8; }
+.big-btn.green:hover { background: rgba(55, 178, 77, 0.12); }
+.big-btn.blue:hover  { background: rgba(76, 110, 245, 0.12); }
+.big-btn.orange:hover { background: rgba(253, 126, 20, 0.12); }
+.big-btn.purple:hover { background: rgba(151, 117, 250, 0.12); }
+.big-btn:hover { transform: translateY(-3px); filter: brightness(1.05); box-shadow: 0 12px 28px rgba(38, 50, 74, 0.18); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
 .toolbar .btn { background: var(--card); color: var(--ink); border: 1px solid var(--border); box-shadow: none; }
+.toolbar .btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ---------- 悬停统一：所有可点按钮轻微变亮并凸起 ---------- */
+.btn:not(:disabled):hover,
+.float-btn:not(.off):not(:disabled):hover,
+.chip:not(.active):hover,
+.preset:not(.active):hover,
+.tag-chip:hover,
+.fav-btn:hover,
+.opt:not(:disabled):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 5px 14px rgba(38, 50, 74, 0.1);
+}
 
 /* ---------- 设置页 ---------- */
 .panel {
@@ -2711,12 +2730,16 @@ if (typeof module !== "undefined" && module.exports) module.exports = (typeof wi
       version: "v1.4",
       title: "知识点学习中心",
       items: [
-        "每道题旁边显示「📌 知识点」标签，点击直接跳转到该知识点的复习内容",
-        "统计页新增「知识点掌握情况」：哪些知识点掌握不足一目了然，点击即可复习",
+        "每道题旁边显示「📌 知识点」标签，点击直接跳到该知识点的复习文本（并自动定位到正文）",
+        "统计页新增「知识点掌握情况」：弱项标红、未练习置灰，点击即可去复习",
         "首页新增「学习中心」：29 个知识点复习文本 + 答题小贴士，随时复习",
-        "常用按钮收纳到右侧悬浮栏，答题时「下一题 / 退出」随时可点",
-        "做题支持快捷键：1-4 选答案、回车下一题、Esc 返回",
-        "错题本 / 收藏夹新增「清空」按钮，点击有确认提示，防误删"
+        "常用按钮统一收纳到右侧悬浮栏：下一题 / 退出、返回、重练错题、清空等，随时可点",
+        "从做题页 / 统计页跳去复习，点「返回」会回到原页面，做题进度不丢",
+        "支持快捷键：1-4 选答案、回车下一题、Esc 返回，按钮上都有提示",
+        "错题本 / 收藏夹 / 统计页都有「清空」按钮（红色，点击弹确认，防误删）",
+        "做题页收藏按钮更醒目（「收藏本题」），知识点标签和收藏按钮都放大了",
+        "新增「📢 更新公告」：可查看每个版本的更新内容",
+        "按钮风格统一：彩色描边 + 彩色字，鼠标悬停变亮凸起，更好辨认可点"
       ]
     },
     {
